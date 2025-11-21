@@ -878,6 +878,316 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Temporary HP */
+        .temp-hp-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 191, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+
+        .temp-hp-input {
+            width: 60px;
+            padding: 5px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(0, 191, 255, 0.5);
+            border-radius: 4px;
+            color: #00bfff;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Concentration Tracker */
+        .concentration-tracker {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .concentration-active {
+            animation: concentrationPulse 2s infinite;
+        }
+
+        @keyframes concentrationPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+        }
+
+        .concentration-spell-name {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 1.1em;
+        }
+
+        /* Conditions Panel */
+        .conditions-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .condition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .condition-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .condition-tag.active {
+            background: rgba(244, 67, 54, 0.3);
+            border-color: #f44336;
+            color: #ff8a80;
+        }
+
+        .condition-tag:hover {
+            transform: scale(1.05);
+        }
+
+        /* XP Tracker */
+        .xp-tracker {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            height: 24px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+        }
+
+        .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8a2be2, #da70d6);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .xp-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .xp-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .xp-input {
+            flex: 1;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .milestone-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Currency Manager */
+        .currency-manager {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .currency-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .currency-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .currency-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .currency-input {
+            width: 100%;
+            padding: 5px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .currency-label {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .currency-total {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .currency-converter {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Passive Scores */
+        .passive-scores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .passive-score-item {
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .passive-score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #64b5f6;
+        }
+
+        .passive-score-label {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Level Up Modal */
+        .level-up-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .level-up-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #ffd700;
+            animation: levelUpAppear 0.5s ease;
+        }
+
+        @keyframes levelUpAppear {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .level-up-title {
+            text-align: center;
+            font-size: 28px;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .level-up-features {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .level-up-feature {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .level-up-feature:last-child {
+            border-bottom: none;
+        }
+
+        .btn-primary {
+            background: #2e7d32;
+            border-color: #66bb6a;
+        }
+
+        .btn-secondary {
+            background: #555;
+            border-color: #777;
+        }
+
+        .btn-secondary:hover {
+            background: #666;
+        }
     </style>
 </head>
 <body>
@@ -1035,11 +1345,31 @@
                             <button class="btn" onclick="changeHP(1)">+1</button>
                             <button class="btn" onclick="changeHP(5)">+5</button>
                         </div>
+                        <div class="temp-hp-section">
+                            <span>Temp HP:</span>
+                            <input type="number" class="temp-hp-input" id="tempHp" value="0" min="0" onchange="updateTempHp()">
+                            <button onclick="clearTempHp()" class="btn btn-small">Clear</button>
+                        </div>
                     </div>
 
                     <div class="quick-actions">
                         <button class="btn" onclick="longRest()">Lange Rast</button>
                         <button class="btn" onclick="shortRest()">Kurze Rast</button>
+                    </div>
+
+                    <div class="concentration-tracker" id="concentrationTracker">
+                        <h4>Concentration</h4>
+                        <div id="concentrationStatus">
+                            <span style="opacity: 0.6">No spell active</span>
+                        </div>
+                        <button onclick="breakConcentration()" class="btn btn-small btn-danger" style="margin-top: 10px; display: none;" id="breakConcentrationBtn">Break Concentration</button>
+                    </div>
+
+                    <div class="conditions-panel">
+                        <h4>Conditions</h4>
+                        <div class="condition-grid" id="conditionGrid">
+                            <!-- Conditions will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
 
@@ -1059,6 +1389,82 @@
                     <h2>Rettungswürfe</h2>
                     <div id="savingThrowsList"></div>
                 </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="xp-tracker">
+                        <h4>Experience Points</h4>
+                        <div class="xp-bar-container">
+                            <div class="xp-bar" id="xpBar" style="width: 0%"></div>
+                        </div>
+                        <div class="xp-info">
+                            <span id="currentXp">0 XP</span>
+                            <span id="nextLevelXp">Next: 300 XP</span>
+                        </div>
+                        <div class="xp-input-group">
+                            <input type="number" class="xp-input" id="addXpInput" placeholder="Add XP">
+                            <button onclick="addXp()" class="btn btn-primary">Add</button>
+                            <button onclick="setXp()" class="btn btn-secondary">Set</button>
+                        </div>
+                        <div class="milestone-toggle">
+                            <input type="checkbox" id="useMilestone" onchange="toggleMilestone()">
+                            <label for="useMilestone">Use Milestone Leveling</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <div class="currency-manager">
+                        <h4>Currency</h4>
+                        <div class="currency-grid">
+                            <div class="currency-item">
+                                <div class="currency-icon">CP</div>
+                                <input type="number" class="currency-input" id="cp" value="0" min="0" onchange="updateCurrency()">
+                                <div class="currency-label">Copper</div>
+                            </div>
+                            <div class="currency-item">
+                                <div class="currency-icon">SP</div>
+                                <input type="number" class="currency-input" id="sp" value="0" min="0" onchange="updateCurrency()">
+                                <div class="currency-label">Silver</div>
+                            </div>
+                            <div class="currency-item">
+                                <div class="currency-icon">EP</div>
+                                <input type="number" class="currency-input" id="ep" value="0" min="0" onchange="updateCurrency()">
+                                <div class="currency-label">Electrum</div>
+                            </div>
+                            <div class="currency-item">
+                                <div class="currency-icon">GP</div>
+                                <input type="number" class="currency-input" id="gp" value="0" min="0" onchange="updateCurrency()">
+                                <div class="currency-label">Gold</div>
+                            </div>
+                            <div class="currency-item">
+                                <div class="currency-icon">PP</div>
+                                <input type="number" class="currency-input" id="pp" value="0" min="0" onchange="updateCurrency()">
+                                <div class="currency-label">Platinum</div>
+                            </div>
+                        </div>
+                        <div class="currency-total">
+                            Total Value: <strong id="totalGold">0</strong> GP
+                        </div>
+                        <div class="currency-converter">
+                            <input type="number" id="convertAmount" placeholder="Amount" min="1" value="10">
+                            <select id="convertFrom">
+                                <option value="cp">CP</option>
+                                <option value="sp">SP</option>
+                                <option value="ep">EP</option>
+                                <option value="gp" selected>GP</option>
+                                <option value="pp">PP</option>
+                            </select>
+                            <select id="convertTo">
+                                <option value="cp">CP</option>
+                                <option value="sp">SP</option>
+                                <option value="ep">EP</option>
+                                <option value="gp">GP</option>
+                                <option value="pp" selected>PP</option>
+                            </select>
+                            <button onclick="convertCurrency()" class="btn btn-small">Convert</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Column: Spells & Skills -->
@@ -1073,6 +1479,24 @@
                 <div class="card" style="margin-top: 20px;">
                     <h2>Fertigkeiten</h2>
                     <div id="skillsList"></div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h4>Passive Scores</h4>
+                    <div class="passive-scores">
+                        <div class="passive-score-item">
+                            <div class="passive-score-value" id="passivePerception">10</div>
+                            <div class="passive-score-label">Perception</div>
+                        </div>
+                        <div class="passive-score-item">
+                            <div class="passive-score-value" id="passiveInvestigation">10</div>
+                            <div class="passive-score-label">Investigation</div>
+                        </div>
+                        <div class="passive-score-item">
+                            <div class="passive-score-value" id="passiveInsight">10</div>
+                            <div class="passive-score-label">Insight</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1098,6 +1522,23 @@
         <div class="wildshape-indicator-title">Tiergestalt aktiv</div>
         <div class="wildshape-indicator-form" id="wildshapeIndicatorName">Wolf</div>
         <button class="wildshape-indicator-revert" onclick="revertWildShape()">Zurück verwandeln</button>
+    </div>
+
+    <!-- Level Up Modal -->
+    <div class="level-up-modal" id="levelUpModal">
+        <div class="level-up-content">
+            <div class="level-up-title">Level Up!</div>
+            <p style="text-align: center;">You've reached <strong id="newLevelDisplay">Level 2</strong>!</p>
+            <div class="level-up-features">
+                <h5>New Features:</h5>
+                <div id="levelUpFeatures">
+                    <!-- Features will be populated by JavaScript -->
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="closeLevelUpModal()" class="btn btn-primary">Acknowledge</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1374,6 +1815,357 @@
             ]
         };
 
+        // D&D 5e Conditions
+        const DND_CONDITIONS = [
+            'Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened',
+            'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
+            'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'
+        ];
+
+        // XP Thresholds
+        const XP_THRESHOLDS = {
+            1: 0, 2: 300, 3: 900, 4: 2700, 5: 6500,
+            6: 14000, 7: 23000, 8: 34000, 9: 48000, 10: 64000,
+            11: 85000, 12: 100000, 13: 120000, 14: 140000, 15: 165000,
+            16: 195000, 17: 225000, 18: 265000, 19: 305000, 20: 355000
+        };
+
+        // Initialize conditions grid
+        function initConditions() {
+            const grid = document.getElementById('conditionGrid');
+            grid.innerHTML = DND_CONDITIONS.map(condition => `
+                <div class="condition-tag" data-condition="${condition}" onclick="toggleCondition('${condition}')">
+                    ${condition}
+                </div>
+            `).join('');
+        }
+
+        // Toggle condition
+        async function toggleCondition(condition) {
+            const tag = document.querySelector(`[data-condition="${condition}"]`);
+            tag.classList.toggle('active');
+
+            const activeConditions = Array.from(document.querySelectorAll('.condition-tag.active'))
+                .map(el => el.dataset.condition);
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_conditions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        conditions: activeConditions
+                    })
+                });
+
+                if (activeConditions.length > 0) {
+                    showNotification(`Conditions updated: ${activeConditions.join(', ')}`, 'warning');
+                }
+            } catch (error) {
+                console.error('Error updating conditions:', error);
+            }
+        }
+
+        // Load conditions from character data
+        function loadConditions(conditions) {
+            document.querySelectorAll('.condition-tag').forEach(tag => {
+                tag.classList.remove('active');
+                if (conditions && conditions.includes(tag.dataset.condition)) {
+                    tag.classList.add('active');
+                }
+            });
+        }
+
+        // Temporary HP functions
+        async function updateTempHp() {
+            const tempHp = parseInt(document.getElementById('tempHp').value) || 0;
+
+            try {
+                await fetch(`${API_URL}?action=update_temp_hp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        temp_hp: tempHp
+                    })
+                });
+                showNotification('Temporary HP updated');
+            } catch (error) {
+                showNotification('Error updating temp HP', 'error');
+            }
+        }
+
+        function clearTempHp() {
+            document.getElementById('tempHp').value = 0;
+            updateTempHp();
+        }
+
+        // Concentration functions
+        async function setConcentration(spellId, spellName) {
+            try {
+                await fetch(`${API_URL}?action=update_concentration`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        spell_id: spellId,
+                        spell_name: spellName
+                    })
+                });
+
+                updateConcentrationDisplay({ spell_name: spellName });
+                showNotification(`Concentrating on: ${spellName}`);
+            } catch (error) {
+                showNotification('Error setting concentration', 'error');
+            }
+        }
+
+        async function breakConcentration() {
+            try {
+                await fetch(`${API_URL}?action=update_concentration`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        spell_id: null
+                    })
+                });
+
+                updateConcentrationDisplay(null);
+                showNotification('Concentration broken', 'warning');
+            } catch (error) {
+                showNotification('Error breaking concentration', 'error');
+            }
+        }
+
+        function updateConcentrationDisplay(concentration) {
+            const tracker = document.getElementById('concentrationTracker');
+            const status = document.getElementById('concentrationStatus');
+            const breakBtn = document.getElementById('breakConcentrationBtn');
+
+            if (concentration && concentration.spell_name) {
+                status.innerHTML = `<span class="concentration-spell-name">${concentration.spell_name}</span>`;
+                tracker.classList.add('concentration-active');
+                breakBtn.style.display = 'inline-block';
+            } else {
+                status.innerHTML = '<span style="opacity: 0.6">No spell active</span>';
+                tracker.classList.remove('concentration-active');
+                breakBtn.style.display = 'none';
+            }
+        }
+
+        // XP Functions
+        function updateXpDisplay(xp, level) {
+            const currentThreshold = XP_THRESHOLDS[level] || 0;
+            const nextThreshold = XP_THRESHOLDS[level + 1] || XP_THRESHOLDS[20];
+
+            const progress = ((xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+
+            document.getElementById('xpBar').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('currentXp').textContent = `${xp} XP`;
+            document.getElementById('nextLevelXp').textContent = level >= 20 ? 'Max Level' : `Next: ${nextThreshold} XP`;
+        }
+
+        async function addXp() {
+            const addAmount = parseInt(document.getElementById('addXpInput').value) || 0;
+            if (addAmount <= 0) return;
+
+            const currentXp = characterStats.xp || 0;
+            const newXp = currentXp + addAmount;
+
+            await saveXp(newXp);
+            document.getElementById('addXpInput').value = '';
+        }
+
+        async function setXp() {
+            const newXp = parseInt(document.getElementById('addXpInput').value) || 0;
+            await saveXp(newXp);
+            document.getElementById('addXpInput').value = '';
+        }
+
+        async function saveXp(xp) {
+            const oldLevel = characterStats.level;
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_xp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        xp: xp,
+                        use_milestone: document.getElementById('useMilestone').checked
+                    })
+                });
+
+                const result = await response.json();
+
+                characterStats.xp = xp;
+                characterStats.level = result.new_level;
+
+                updateXpDisplay(xp, result.new_level);
+
+                if (result.new_level > oldLevel) {
+                    showLevelUpModal(result.new_level);
+                } else {
+                    showNotification('XP updated');
+                }
+            } catch (error) {
+                showNotification('Error updating XP', 'error');
+            }
+        }
+
+        function toggleMilestone() {
+            const useMilestone = document.getElementById('useMilestone').checked;
+            showNotification(useMilestone ? 'Using milestone leveling' : 'Using XP leveling');
+        }
+
+        // Level Up Modal
+        async function showLevelUpModal(newLevel) {
+            document.getElementById('newLevelDisplay').textContent = `Level ${newLevel}`;
+
+            // Fetch new features for this level
+            try {
+                const response = await fetch(`${API_URL}?action=class_features&class=druid&level=${newLevel}`);
+                const result = await response.json();
+
+                const newFeatures = result.data.filter(f => f.level === newLevel);
+                const featuresHtml = newFeatures.length > 0
+                    ? newFeatures.map(f => `<div class="level-up-feature">* ${f.name}</div>`).join('')
+                    : '<div class="level-up-feature">No new features at this level</div>';
+
+                document.getElementById('levelUpFeatures').innerHTML = featuresHtml;
+            } catch (error) {
+                document.getElementById('levelUpFeatures').innerHTML = '<div class="level-up-feature">Unable to load features</div>';
+            }
+
+            document.getElementById('levelUpModal').style.display = 'flex';
+        }
+
+        function closeLevelUpModal() {
+            document.getElementById('levelUpModal').style.display = 'none';
+        }
+
+        // Currency Functions
+        function updateCurrencyDisplay(currency) {
+            if (!currency) currency = { cp: 0, sp: 0, ep: 0, gp: 0, pp: 0 };
+
+            document.getElementById('cp').value = currency.cp || 0;
+            document.getElementById('sp').value = currency.sp || 0;
+            document.getElementById('ep').value = currency.ep || 0;
+            document.getElementById('gp').value = currency.gp || 0;
+            document.getElementById('pp').value = currency.pp || 0;
+
+            // Calculate total in GP
+            const totalGp = (
+                (currency.cp || 0) / 100 +
+                (currency.sp || 0) / 10 +
+                (currency.ep || 0) / 2 +
+                (currency.gp || 0) +
+                (currency.pp || 0) * 10
+            ).toFixed(2);
+
+            document.getElementById('totalGold').textContent = totalGp;
+        }
+
+        async function updateCurrency() {
+            try {
+                await fetch(`${API_URL}?action=update_currency`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        cp: parseInt(document.getElementById('cp').value) || 0,
+                        sp: parseInt(document.getElementById('sp').value) || 0,
+                        ep: parseInt(document.getElementById('ep').value) || 0,
+                        gp: parseInt(document.getElementById('gp').value) || 0,
+                        pp: parseInt(document.getElementById('pp').value) || 0
+                    })
+                });
+
+                // Recalculate total
+                const currency = {
+                    cp: parseInt(document.getElementById('cp').value) || 0,
+                    sp: parseInt(document.getElementById('sp').value) || 0,
+                    ep: parseInt(document.getElementById('ep').value) || 0,
+                    gp: parseInt(document.getElementById('gp').value) || 0,
+                    pp: parseInt(document.getElementById('pp').value) || 0
+                };
+
+                const totalGp = (
+                    currency.cp / 100 +
+                    currency.sp / 10 +
+                    currency.ep / 2 +
+                    currency.gp +
+                    currency.pp * 10
+                ).toFixed(2);
+
+                document.getElementById('totalGold').textContent = totalGp;
+            } catch (error) {
+                showNotification('Error updating currency', 'error');
+            }
+        }
+
+        async function convertCurrency() {
+            const amount = parseInt(document.getElementById('convertAmount').value) || 0;
+            const from = document.getElementById('convertFrom').value;
+            const to = document.getElementById('convertTo').value;
+
+            if (amount <= 0 || from === to) {
+                showNotification('Invalid conversion', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}?action=convert_currency`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        char_id: currentCharacterId,
+                        from: from,
+                        to: to,
+                        amount: amount
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    updateCurrencyDisplay(result.new_currency);
+                    showNotification(`Converted ${amount} ${from.toUpperCase()} to ${to.toUpperCase()}`);
+                } else {
+                    showNotification(result.error || 'Conversion failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Error converting currency', 'error');
+            }
+        }
+
+        // Passive Scores
+        function calculatePassiveScores(character) {
+            const wisdomMod = Math.floor((character.wisdom - 10) / 2);
+            const intelligenceMod = Math.floor((character.intelligence - 10) / 2);
+
+            // Base passive = 10 + modifier
+            // Add proficiency bonus if proficient
+            const profBonus = Math.ceil(1 + character.level / 4);
+
+            const skills = character.skill_proficiencies || [];
+
+            const passivePerception = 10 + wisdomMod + (skills.includes('perception') ? profBonus : 0);
+            const passiveInvestigation = 10 + intelligenceMod + (skills.includes('investigation') ? profBonus : 0);
+            const passiveInsight = 10 + wisdomMod + (skills.includes('insight') ? profBonus : 0);
+
+            document.getElementById('passivePerception').textContent = passivePerception;
+            document.getElementById('passiveInvestigation').textContent = passiveInvestigation;
+            document.getElementById('passiveInsight').textContent = passiveInsight;
+        }
+
+        // Notification function (if not already present)
+        function showNotification(message, type = 'success') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            // You can add a visual notification system here
+        }
+
         // API Functions
         async function apiRequest(action, method = 'GET', data = null) {
             const url = method === 'GET' && data
@@ -1441,6 +2233,23 @@
                 console.log('Equipped weapon loaded:', equippedWeapon);
 
                 updateDisplay();
+
+                // Load new features data
+                if (char.conditions) {
+                    loadConditions(char.conditions);
+                }
+
+                if (char.concentration) {
+                    updateConcentrationDisplay(char.concentration);
+                }
+
+                if (char.temp_hp) {
+                    document.getElementById('tempHp').value = char.temp_hp;
+                }
+
+                updateXpDisplay(char.xp || 0, char.level);
+                updateCurrencyDisplay(char.currency);
+                calculatePassiveScores(char);
             }
         }
 
@@ -2199,6 +3008,7 @@
 
         // Initialize
         async function init() {
+            initConditions();
             await loadCharacter();
             await loadSpells();
         }

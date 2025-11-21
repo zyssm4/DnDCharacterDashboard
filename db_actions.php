@@ -112,6 +112,9 @@ if ($method === 'GET') {
             $character['saving_throw_proficiencies'] = json_decode($character['saving_throw_proficiencies'] ?? '[]', true);
             $character['skill_proficiencies'] = json_decode($character['skill_proficiencies'] ?? '[]', true);
             $character['equipped_weapon'] = json_decode($character['equipped_weapon'] ?? 'null', true);
+            $character['conditions'] = json_decode($character['conditions'] ?? '[]', true);
+            $character['concentration'] = json_decode($character['concentration'] ?? 'null', true);
+            $character['currency'] = json_decode($character['currency'] ?? '{"cp":0,"sp":0,"ep":0,"gp":0,"pp":0}', true);
 
             echo json_encode(['success' => true, 'data' => $character]);
             break;
@@ -452,7 +455,37 @@ if ($method === 'GET') {
                 ]
             ]);
             break;
-            
+
+        // Get character conditions
+        case 'conditions':
+            $charId = $_GET['char_id'] ?? null;
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("SELECT conditions FROM characters WHERE id = ?");
+            $stmt->execute([$charId]);
+            $result = $stmt->fetch();
+
+            $conditions = json_decode($result['conditions'] ?? '[]', true) ?? [];
+            echo json_encode(['success' => true, 'data' => $conditions]);
+            break;
+
+        // Get XP thresholds
+        case 'xp_thresholds':
+            // XP required for each level (D&D 5e)
+            $thresholds = [
+                1 => 0, 2 => 300, 3 => 900, 4 => 2700, 5 => 6500,
+                6 => 14000, 7 => 23000, 8 => 34000, 9 => 48000, 10 => 64000,
+                11 => 85000, 12 => 100000, 13 => 120000, 14 => 140000, 15 => 165000,
+                16 => 195000, 17 => 225000, 18 => 265000, 19 => 305000, 20 => 355000
+            ];
+            echo json_encode(['success' => true, 'data' => $thresholds]);
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Invalid action']);
@@ -824,6 +857,201 @@ else if ($method === 'POST') {
             $stmt->execute(['$.' . $resourceName, $resourceValue, $charId]);
 
             echo json_encode(['success' => true, 'message' => 'Class resource updated']);
+            break;
+
+        // Update temporary HP
+        case 'update_temp_hp':
+            $charId = $input['char_id'] ?? null;
+            $tempHp = $input['temp_hp'] ?? 0;
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET temp_hp = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([$tempHp, $charId]);
+
+            echo json_encode(['success' => true, 'message' => 'Temporary HP updated']);
+            break;
+
+        // Update conditions
+        case 'update_conditions':
+            $charId = $input['char_id'] ?? null;
+            $conditions = json_encode($input['conditions'] ?? []);
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET conditions = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([$conditions, $charId]);
+
+            echo json_encode(['success' => true, 'message' => 'Conditions updated']);
+            break;
+
+        // Update concentration
+        case 'update_concentration':
+            $charId = $input['char_id'] ?? null;
+            $spellId = $input['spell_id'] ?? null;
+            $spellName = $input['spell_name'] ?? null;
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $concentration = $spellId ? json_encode([
+                'spell_id' => $spellId,
+                'spell_name' => $spellName,
+                'started_at' => date('Y-m-d H:i:s')
+            ]) : null;
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET concentration = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([$concentration, $charId]);
+
+            echo json_encode(['success' => true, 'message' => 'Concentration updated']);
+            break;
+
+        // Update XP
+        case 'update_xp':
+            $charId = $input['char_id'] ?? null;
+            $xp = $input['xp'] ?? null;
+            $useMilestone = $input['use_milestone'] ?? false;
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            // XP thresholds for leveling
+            $thresholds = [
+                1 => 0, 2 => 300, 3 => 900, 4 => 2700, 5 => 6500,
+                6 => 14000, 7 => 23000, 8 => 34000, 9 => 48000, 10 => 64000,
+                11 => 85000, 12 => 100000, 13 => 120000, 14 => 140000, 15 => 165000,
+                16 => 195000, 17 => 225000, 18 => 265000, 19 => 305000, 20 => 355000
+            ];
+
+            // Calculate new level based on XP
+            $newLevel = 1;
+            foreach ($thresholds as $level => $threshold) {
+                if ($xp >= $threshold) {
+                    $newLevel = $level;
+                }
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET xp = ?, level = ?, use_milestone = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([$xp, $newLevel, $useMilestone ? 1 : 0, $charId]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'XP updated',
+                'new_level' => $newLevel,
+                'leveled_up' => false // Frontend will check this
+            ]);
+            break;
+
+        // Update currency
+        case 'update_currency':
+            $charId = $input['char_id'] ?? null;
+            $currency = json_encode([
+                'cp' => $input['cp'] ?? 0,
+                'sp' => $input['sp'] ?? 0,
+                'ep' => $input['ep'] ?? 0,
+                'gp' => $input['gp'] ?? 0,
+                'pp' => $input['pp'] ?? 0
+            ]);
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET currency = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([$currency, $charId]);
+
+            echo json_encode(['success' => true, 'message' => 'Currency updated']);
+            break;
+
+        // Convert currency
+        case 'convert_currency':
+            $charId = $input['char_id'] ?? null;
+            $fromType = $input['from'] ?? null;
+            $toType = $input['to'] ?? null;
+            $amount = $input['amount'] ?? 0;
+
+            if (!$charId || !$fromType || !$toType) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID, from, and to currency types required']);
+                exit;
+            }
+
+            // Conversion rates (everything to CP base)
+            $toCp = ['cp' => 1, 'sp' => 10, 'ep' => 50, 'gp' => 100, 'pp' => 1000];
+
+            // Get current currency
+            $stmt = $pdo->prepare("SELECT currency FROM characters WHERE id = ?");
+            $stmt->execute([$charId]);
+            $result = $stmt->fetch();
+            $currency = json_decode($result['currency'] ?? '{}', true) ?? [
+                'cp' => 0, 'sp' => 0, 'ep' => 0, 'gp' => 0, 'pp' => 0
+            ];
+
+            // Calculate conversion
+            $cpValue = $amount * $toCp[$fromType];
+            $convertedAmount = floor($cpValue / $toCp[$toType]);
+            $remainder = $cpValue % $toCp[$toType];
+
+            // Check if enough currency
+            if ($currency[$fromType] < $amount) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Not enough ' . strtoupper($fromType)]);
+                exit;
+            }
+
+            // Update currency
+            $currency[$fromType] -= $amount;
+            $currency[$toType] += $convertedAmount;
+            $currency['cp'] += $remainder; // Remainder goes to copper
+
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET currency = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute([json_encode($currency), $charId]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Currency converted',
+                'new_currency' => $currency
+            ]);
             break;
 
         default:
