@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5e Multi-Klassen Tracker</title>
+    <link rel="stylesheet" href="assets/icons/class-icons.svg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            color: #e8e8e8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #dfe6e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a8a8a8;
+            font-weight: 300;
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .class-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--class-color-1), var(--class-color-2));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 0;
+        }
+
+        .class-card:hover::before {
+            opacity: 0.15;
+        }
+
+        .class-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--class-color-1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--class-color-1);
+        }
+
+        .class-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .class-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .class-card:hover .class-icon {
+            transform: scale(1.1);
+        }
+
+        .class-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--class-color-1);
+        }
+
+        .class-description {
+            font-size: 0.9em;
+            color: #c8c8c8;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .class-features {
+            font-size: 0.85em;
+            color: #a8a8a8;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .class-features strong {
+            color: var(--class-color-2);
+        }
+
+        /* Klassenspezifische Farben */
+        .druid {
+            --class-color-1: #66bb6a;
+            --class-color-2: #a5d6a7;
+        }
+
+        .rogue {
+            --class-color-1: #c8102e;
+            --class-color-2: #e6b800;
+        }
+
+        .bard {
+            --class-color-1: #ab47bc;
+            --class-color-2: #ce93d8;
+        }
+
+        .wizard {
+            --class-color-1: #42a5f5;
+            --class-color-2: #90caf9;
+        }
+
+        .paladin {
+            --class-color-1: #ffd54f;
+            --class-color-2: #fff9c4;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .class-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .class-card {
+                padding: 20px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #a8a8a8;
+        }
+
+        .class-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 16px rgba(76, 175, 80, 0.7);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎲 D&D 5e Character Tracker 🎲</h1>
+        <p class="subtitle">Wähle deine Klasse</p>
+    </div>
+
+    <!-- SVG Icons laden -->
+    <div style="display: none;">
+        <object data="assets/icons/class-icons.svg" type="image/svg+xml" id="svg-icons"></object>
+    </div>
+
+    <div class="class-grid">
+        <!-- Druide -->
+        <div class="class-card druid" onclick="selectClass('druid')">
+            <div class="class-content">
+                <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-druid"></use></svg>
+                <div class="class-name">Druide</div>
+                <div class="class-description">
+                    Wächter der Natur und Meister der Gestaltwandlung. Du kannst dich in mächtige Tiere verwandeln und die Kräfte der Natur nutzen.
+                </div>
+                <div class="class-features">
+                    <strong>Hauptattribut:</strong> Weisheit<br>
+                    <strong>Besonderheit:</strong> Wild Shape, Zauber bis Stufe 9<br>
+                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                </div>
+            </div>
+        </div>
+
+        <!-- Schurke -->
+        <div class="class-card rogue" onclick="selectClass('rogue')">
+            <div class="class-content">
+                <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-rogue"></use></svg>
+                <div class="class-name">Schurke</div>
+                <div class="class-description">
+                    Meister der Heimlichkeit und des Hinterhältigen Angriffs. Perfekt für Piraten, Diebe und alle, die aus dem Schatten zuschlagen.
+                </div>
+                <div class="class-features">
+                    <strong>Hauptattribut:</strong> Geschicklichkeit<br>
+                    <strong>Besonderheit:</strong> Sneak Attack, Cunning Action, Expertise<br>
+                    <strong>Zauberwirker:</strong> Kein Zauber
+                </div>
+            </div>
+        </div>
+
+        <!-- Barde -->
+        <div class="class-card bard" onclick="selectClass('bard')">
+            <div class="class-content">
+                <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-bard"></use></svg>
+                <div class="class-name">Barde</div>
+                <div class="class-description">
+                    Charismatischer Künstler und vielseitiger Zauberwirker. Inspiriere deine Verbündeten und lerne Zauber aus allen Klassen!
+                </div>
+                <div class="class-features">
+                    <strong>Hauptattribut:</strong> Charisma<br>
+                    <strong>Besonderheit:</strong> Bardic Inspiration, Jack of All Trades, Magical Secrets<br>
+                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                </div>
+            </div>
+        </div>
+
+        <!-- Magier -->
+        <div class="class-card wizard" onclick="selectClass('wizard')">
+            <div class="class-content">
+                <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-wizard"></use></svg>
+                <div class="class-name">Magier</div>
+                <div class="class-description">
+                    Gelehrter der arkanen Künste mit der größten Zauberliste. Nutze dein Zauberbuch, um die mächtigsten Zauber zu wirken.
+                </div>
+                <div class="class-features">
+                    <strong>Hauptattribut:</strong> Intelligenz<br>
+                    <strong>Besonderheit:</strong> Zauberbuch, Ritual Casting, Arcane Recovery<br>
+                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                </div>
+            </div>
+        </div>
+
+        <!-- Paladin -->
+        <div class="class-card paladin" onclick="selectClass('paladin')">
+            <div class="class-content">
+                <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-paladin"></use></svg>
+                <div class="class-name">Paladin</div>
+                <div class="class-description">
+                    Heiliger Krieger mit göttlicher Macht. Heile Verbündete mit Handauflegen und vernichte Feinde mit göttlichen Schlägen!
+                </div>
+                <div class="class-features">
+                    <strong>Hauptattribut:</strong> Stärke & Charisma<br>
+                    <strong>Besonderheit:</strong> Lay on Hands, Divine Smite, Auras<br>
+                    <strong>Zauberwirker:</strong> Halber Zauberwirker (bis Stufe 5)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>D&D 5e Multi-Class Character Tracker &copy; 2024</p>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+
+        async function selectClass(className) {
+            console.log('Klasse ausgewählt:', className);
+
+            // Add visual feedback
+            const card = document.querySelector(`.class-card.${className}`);
+            if (card) {
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+            }
+
+            try {
+                // Prüfe ob bereits ein Charakter für diese Klasse existiert
+                const response = await fetch(`${API_URL}?action=check_character&class=${className}`);
+                const result = await response.json();
+
+                if (result.success && result.exists) {
+                    // Charakter existiert - gehe zum Dashboard
+                    console.log('Charakter gefunden:', result.data);
+                    showMessage(`Lade ${result.data.name}...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = getDashboardUrl(className);
+                    }, 500);
+                } else {
+                    // Kein Charakter - gehe zur Charaktererstellung
+                    console.log('Kein Charakter gefunden - Charaktererstellung starten');
+                    showMessage('Starte Charaktererstellung...', 'info');
+                    setTimeout(() => {
+                        window.location.href = `character-creation.html?class=${className}`;
+                    }, 500);
+                }
+            } catch (error) {
+                console.error('Fehler beim Prüfen des Charakters:', error);
+                showMessage('Verbindungsfehler - Starte Charaktererstellung...', 'warning');
+                // Im Fehlerfall direkt zur Charaktererstellung
+                setTimeout(() => {
+                    window.location.href = `character-creation.html?class=${className}`;
+                }, 500);
+            }
+        }
+
+        function showMessage(text, type) {
+            const existingMsg = document.querySelector('.status-message');
+            if (existingMsg) existingMsg.remove();
+
+            const msg = document.createElement('div');
+            msg.className = `status-message ${type}`;
+            msg.textContent = text;
+            msg.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#FF9800' : '#2196F3'};
+                color: white;
+                padding: 15px 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-weight: bold;
+                animation: slideDown 0.3s ease-out;
+            `;
+            document.body.appendChild(msg);
+
+            setTimeout(() => msg.remove(), 3000);
+        }
+
+        function getDashboardUrl(className) {
+            const dashboardMap = {
+                'druid': 'dashboard.html',
+                'rogue': 'dashboard-rogue.html',
+                'bard': 'dashboard-bard.html',
+                'wizard': 'dashboard-wizard.html',
+                'paladin': 'dashboard-paladin.html'
+            };
+
+            return dashboardMap[className] || 'dashboard.html';
+        }
+
+        // Check which classes have existing characters and add badges
+        async function checkExistingCharacters() {
+            const classes = ['druid', 'rogue', 'bard', 'wizard', 'paladin'];
+
+            for (const className of classes) {
+                try {
+                    const response = await fetch(`${API_URL}?action=check_character&class=${className}`);
+                    const result = await response.json();
+
+                    if (result.success && result.exists) {
+                        const card = document.querySelector(`.class-card.${className}`);
+                        if (card) {
+                            const badge = document.createElement('div');
+                            badge.className = 'class-badge';
+                            badge.textContent = '✓ Charakter vorhanden';
+                            card.querySelector('.class-content').appendChild(badge);
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Fehler beim Prüfen der Klasse ${className}:`, error);
+                }
+            }
+        }
+
+        // Animation beim Laden
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.class-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease-out';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Check for existing characters after animation
+            setTimeout(() => {
+                checkExistingCharacters();
+            }, 800);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Druiden Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0a 100%);
+            color: #e8f5e9;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        /* Wild Shape Active State - Brown Earth Tones */
+        body.wildshape-active {
+            background: linear-gradient(135deg, #5d4037 0%, #3e2723 100%);
+        }
+
+        body.wildshape-active .navbar {
+            background: rgba(93, 64, 55, 0.9);
+        }
+
+        body.wildshape-active .card {
+            background: rgba(93, 64, 55, 0.3);
+            border-color: #a1887f;
+        }
+
+        body.wildshape-active .btn {
+            background: #6d4c41;
+            border-color: #a1887f;
+        }
+
+        body.wildshape-active .btn:hover {
+            background: #8d6e63;
+            border-color: #bcaaa4;
+        }
+
+        body.wildshape-active .ability-box,
+        body.wildshape-active .stat-compact,
+        body.wildshape-active .hp-tracker {
+            border-color: #a1887f;
+        }
+
+        body.wildshape-active .navbar h1 {
+            color: #d7ccc8;
+        }
+
+        body.wildshape-active h2,
+        body.wildshape-active .stat-name {
+            color: #bcaaa4;
+        }
+
+        .navbar {
+            background: rgba(46, 125, 50, 0.9);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            color: #a5d6a7;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-icon {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid #66bb6a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #e8f5e9;
+        }
+
+        .nav-item:hover {
+            background: rgba(46, 125, 50, 0.5);
+            border-color: #a5d6a7;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(46, 125, 50, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #66bb6a;
+        }
+
+        .card h2 {
+            color: #a5d6a7;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .stat-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            margin-bottom: 8px;
+            border: 1px solid #81c784;
+        }
+
+        .stat-compact.proficient {
+            background: rgba(46, 125, 50, 0.4);
+            border-color: #a5d6a7;
+        }
+
+        .stat-name {
+            font-weight: bold;
+            color: #a5d6a7;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e8f5e9;
+        }
+
+        .ability-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ability-box {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #81c784;
+        }
+
+        .ability-box .label {
+            font-size: 0.8em;
+            color: #a5d6a7;
+            margin-bottom: 5px;
+        }
+
+        .ability-box .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .ability-box .modifier {
+            font-size: 1.1em;
+            color: #c8e6c9;
+        }
+
+        .hp-tracker {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #81c784;
+        }
+
+        .hp-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #66bb6a;
+        }
+
+        .hp-max {
+            font-size: 1.2em;
+            color: #c8e6c9;
+            margin-top: 5px;
+        }
+
+        .hp-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #2e7d32;
+            color: #e8f5e9;
+            border: 2px solid #66bb6a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .btn:hover {
+            background: #388e3c;
+            border-color: #a5d6a7;
+        }
+
+        .btn-small {
+            padding: 5px 15px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger {
+            background: #c62828;
+            border-color: #e57373;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .spell-slots-compact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .slot-compact {
+            flex: 1;
+            min-width: 80px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #81c784;
+        }
+
+        .slot-compact .level {
+            font-size: 1em;
+            color: #a5d6a7;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .slot-compact .circles {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .slot-circle-mini {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #66bb6a;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .slot-circle-mini.used {
+            background: #2e7d32;
+        }
+
+        .slot-circle-mini:hover {
+            transform: scale(1.1);
+            border-color: #a5d6a7;
+        }
+
+        .prepared-spells-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .spell-compact {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            border: 1px solid #81c784;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .spell-compact:hover {
+            background: rgba(46, 125, 50, 0.3);
+            border-color: #a5d6a7;
+        }
+
+        .spell-compact .name {
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 3px;
+        }
+
+        .spell-compact .level {
+            font-size: 0.85em;
+            color: #c8e6c9;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+
+        .cantrip-section {
+            margin-bottom: 20px;
+        }
+
+        .cantrip-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .cantrip-badge {
+            background: rgba(46, 125, 50, 0.4);
+            padding: 8px 12px;
+            border-radius: 15px;
+            border: 1px solid #a5d6a7;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cantrip-badge:hover {
+            background: rgba(46, 125, 50, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .weapon-display {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid #81c784;
+        }
+
+        .weapon-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .weapon-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .weapon-stat {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+
+        .weapon-stat-label {
+            font-size: 0.8em;
+            color: #c8e6c9;
+            margin-bottom: 5px;
+        }
+
+        .weapon-stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #a5d6a7;
+        }
+
+        .circle-info {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px solid #81c784;
+        }
+
+        .circle-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .circle-description {
+            color: #c8e6c9;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .circle-features {
+            margin-top: 10px;
+        }
+
+        .circle-feature {
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .circle-feature-title {
+            color: #81c784;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+
+        .circle-feature-text {
+            color: #c8e6c9;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        /* Wild Shape Tracker */
+        .wildshape-circles {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .wildshape-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #66bb6a;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(102, 187, 106, 0.3);
+            position: relative;
+        }
+
+        .wildshape-circle.used {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: #555;
+        }
+
+        .wildshape-circle:hover {
+            transform: scale(1.1);
+            border-color: #a5d6a7;
+        }
+
+        .wildshape-form {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #81c784;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wildshape-form:hover {
+            background: rgba(46, 125, 50, 0.3);
+            border-color: #a5d6a7;
+            transform: translateX(5px);
+        }
+
+        .wildshape-form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .wildshape-form-name {
+            font-weight: bold;
+            color: #a5d6a7;
+            font-size: 1.05em;
+        }
+
+        .wildshape-form-cr {
+            background: rgba(46, 125, 50, 0.5);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            color: #c8e6c9;
+        }
+
+        .wildshape-form-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 0.85em;
+            color: #c8e6c9;
+            margin-top: 8px;
+        }
+
+        .wildshape-form-stat {
+            text-align: center;
+        }
+
+        .wildshape-form-stat-label {
+            font-size: 0.8em;
+            color: #a5d6a7;
+            margin-bottom: 2px;
+        }
+
+        .wildshape-form-stat-value {
+            font-weight: bold;
+            color: #e8f5e9;
+        }
+
+        /* Wild Shape Tooltip */
+        .wildshape-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #a5d6a7;
+            border-radius: 10px;
+            padding: 15px;
+            color: #e8f5e9;
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 400px;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .wildshape-tooltip.show {
+            display: block;
+        }
+
+        .wildshape-tooltip-header {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #66bb6a;
+        }
+
+        .wildshape-tooltip-section {
+            margin-bottom: 12px;
+        }
+
+        .wildshape-tooltip-section-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #81c784;
+            margin-bottom: 5px;
+        }
+
+        .wildshape-tooltip-attacks {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .wildshape-tooltip-attack {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .wildshape-tooltip-abilities {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .wildshape-tooltip-ability {
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .wildshape-tooltip-ability-label {
+            color: #a5d6a7;
+            font-weight: bold;
+        }
+
+        /* Wild Shape Active Indicator */
+        .wildshape-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(93, 64, 55, 0.9);
+            border: 2px solid #a1887f;
+            border-radius: 10px;
+            padding: 15px 20px;
+            color: #d7ccc8;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .wildshape-indicator.show {
+            display: block;
+        }
+
+        .wildshape-indicator-title {
+            font-size: 0.9em;
+            color: #bcaaa4;
+            margin-bottom: 5px;
+        }
+
+        .wildshape-indicator-form {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d7ccc8;
+            margin-bottom: 10px;
+        }
+
+        .wildshape-indicator-revert {
+            padding: 8px 15px;
+            background: #6d4c41;
+            color: #e8f5e9;
+            border: 2px solid #a1887f;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            width: 100%;
+        }
+
+        .wildshape-indicator-revert:hover {
+            background: #8d6e63;
+            border-color: #bcaaa4;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ability-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .navbar h1 {
+                font-size: 1.2em;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            .dashboard-grid {
+                gap: 15px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .ability-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .ability-box {
+                padding: 10px;
+            }
+
+            .ability-box .label {
+                font-size: 0.7em;
+            }
+
+            .ability-box .value {
+                font-size: 1.4em;
+            }
+
+            .ability-box .modifier {
+                font-size: 0.9em;
+            }
+
+            .hp-display {
+                font-size: 2.5em;
+            }
+
+            .hp-controls {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: 60px;
+            }
+
+            .weapon-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ability-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .spell-slots-compact {
+                flex-direction: column;
+            }
+
+            .slot-compact {
+                min-width: 100%;
+            }
+        }
+
+        /* Spell Detail Modal */
+        .spell-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .spell-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .spell-modal-content {
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0a 100%);
+            border: 3px solid #66bb6a;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            position: relative;
+        }
+
+        .spell-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #66bb6a;
+        }
+
+        .spell-modal-title {
+            font-size: 1.8em;
+            color: #a5d6a7;
+            font-weight: bold;
+        }
+
+        .spell-modal-close {
+            background: #c62828;
+            color: white;
+            border: 2px solid #e57373;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+        }
+
+        .spell-modal-close:hover {
+            background: #d32f2f;
+            transform: scale(1.05);
+        }
+
+        .spell-modal-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .spell-meta-item {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #81c784;
+        }
+
+        .spell-meta-label {
+            font-size: 0.85em;
+            color: #a5d6a7;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .spell-meta-value {
+            color: #e8f5e9;
+            font-size: 1.1em;
+        }
+
+        .spell-modal-description {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #81c784;
+            color: #c8e6c9;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .spell-modal-description strong {
+            color: #ffeb3b;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .spell-modal-content {
+                padding: 20px;
+            }
+
+            .spell-modal-title {
+                font-size: 1.5em;
+            }
+
+            .spell-modal-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>
+            <svg class="navbar-icon"><use href="assets/icons/class-icons.svg#icon-druid"></use></svg>
+            Druiden Dashboard
+        </h1>
+        <div class="nav-menu">
+            <a href="class-selection.html" class="nav-item">🏠 Zur Klassenauswahl</a>
+            <a href="dashboard.html" class="nav-item">Dashboard</a>
+            <a href="character.html" class="nav-item">Charakter bearbeiten</a>
+            <a href="spells.html" class="nav-item">Zauber verwalten</a>
+            <a href="equipment.html" class="nav-item">Ausrüstung</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Left Column: Character Stats -->
+            <div>
+                <div class="card">
+                    <h2 id="characterName">Druide</h2>
+                    <div class="info-row">
+                        <span>Stufe:</span>
+                        <strong id="charLevel">1</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Kreis:</span>
+                        <strong id="charCircle">-</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>Übungsbonus:</span>
+                        <strong id="profBonus">+2</strong>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>Attribute</h2>
+                    <div class="ability-grid">
+                        <div class="ability-box">
+                            <div class="label">STR</div>
+                            <div class="value" id="strValue">10</div>
+                            <div class="modifier" id="strMod">+0</div>
+                        </div>
+                        <div class="ability-box">
+                            <div class="label">GES</div>
+                            <div class="value" id="dexValue">10</div>
+                            <div class="modifier" id="dexMod">+0</div>
+                        </div>
+                        <div class="ability-box">
+                            <div class="label">KON</div>
+                            <div class="value" id="conValue">10</div>
+                            <div class="modifier" id="conMod">+0</div>
+                        </div>
+                        <div class="ability-box">
+                            <div class="label">INT</div>
+                            <div class="value" id="intValue">10</div>
+                            <div class="modifier" id="intMod">+0</div>
+                        </div>
+                        <div class="ability-box">
+                            <div class="label">WEI</div>
+                            <div class="value" id="wisValue">10</div>
+                            <div class="modifier" id="wisMod">+0</div>
+                        </div>
+                        <div class="ability-box">
+                            <div class="label">CHA</div>
+                            <div class="value" id="chaValue">10</div>
+                            <div class="modifier" id="chaMod">+0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>Kampfwerte</h2>
+                    <div class="stat-compact">
+                        <span class="stat-name">Rüstungsklasse</span>
+                        <span class="stat-value" id="acValue">10</span>
+                    </div>
+                    <div class="stat-compact">
+                        <span class="stat-name">Initiative</span>
+                        <span class="stat-value" id="initiativeValue">+0</span>
+                    </div>
+                    <div class="stat-compact">
+                        <span class="stat-name">Geschwindigkeit</span>
+                        <span class="stat-value" id="speedValue">9 m</span>
+                    </div>
+                    <div class="stat-compact">
+                        <span class="stat-name">Zauber SG</span>
+                        <span class="stat-value" id="spellDC">13</span>
+                    </div>
+                    <div class="stat-compact">
+                        <span class="stat-name">Zauber Angriff</span>
+                        <span class="stat-value" id="spellAttack">+5</span>
+                    </div>
+
+                    <!-- Weapon Display -->
+                    <div class="weapon-display" id="weaponDisplay">
+                        <div class="weapon-name" id="weaponName">Keine Waffe ausgerüstet</div>
+                        <div class="weapon-stats" id="weaponStats" style="display: none;">
+                            <div class="weapon-stat">
+                                <div class="weapon-stat-label">Angriffswurf</div>
+                                <div class="weapon-stat-value" id="weaponAttackBonus">+0</div>
+                            </div>
+                            <div class="weapon-stat">
+                                <div class="weapon-stat-label">Schaden</div>
+                                <div class="weapon-stat-value" id="weaponDamage">1d6</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Druid Circle Info -->
+                    <div class="circle-info" id="circleInfo" style="display: none;">
+                        <div class="circle-title" id="circleTitle">Zirkel des Mondes</div>
+                        <div class="circle-description" id="circleDescription"></div>
+                        <div class="circle-features" id="circleFeatures"></div>
+                    </div>
+                </div>
+
+                <!-- Wild Shape Tracker -->
+                <div class="card" style="margin-top: 20px;" id="wildShapeCard">
+                    <h2>🐺 Tiergestalt</h2>
+                    <div class="wildshape-uses">
+                        <div style="text-align: center; margin-bottom: 15px;">
+                            <div style="font-size: 0.9em; color: #a5d6a7; margin-bottom: 8px;">Verfügbare Verwendungen</div>
+                            <div class="wildshape-circles" id="wildshapeCircles">
+                                <div class="wildshape-circle"></div>
+                                <div class="wildshape-circle"></div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; font-size: 0.85em; color: #c8e6c9; margin-bottom: 10px;">
+                            Dauer: <strong id="wildshapeDuration">1 Stunde</strong>
+                        </div>
+                        <div style="text-align: center; font-size: 0.85em; color: #c8e6c9;">
+                            Max HG: <strong id="wildshapeMaxCR">1/4</strong>
+                        </div>
+                    </div>
+                    <div class="wildshape-forms" id="wildshapeForms">
+                        <div style="font-size: 0.9em; color: #a5d6a7; margin: 15px 0 10px 0; font-weight: bold;">Verfügbare Formen:</div>
+                        <div id="wildshapeFormsList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Column: Main Actions -->
+            <div>
+                <div class="card">
+                    <div class="hp-tracker">
+                        <div style="color: #a5d6a7; margin-bottom: 10px;">Trefferpunkte</div>
+                        <div class="hp-display" id="currentHP">8</div>
+                        <div class="hp-max">/ <span id="maxHP">8</span></div>
+                        <div class="hp-controls">
+                            <button class="btn btn-danger" onclick="changeHP(-5)">-5</button>
+                            <button class="btn btn-danger" onclick="changeHP(-1)">-1</button>
+                            <button class="btn" onclick="changeHP(1)">+1</button>
+                            <button class="btn" onclick="changeHP(5)">+5</button>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <button class="btn" onclick="longRest()">Lange Rast</button>
+                        <button class="btn" onclick="shortRest()">Kurze Rast</button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>Zauberplätze</h2>
+                    <div class="spell-slots-compact" id="spellSlotsContainer"></div>
+                </div>
+
+                <div class="card cantrip-section" style="margin-top: 20px;">
+                    <h2>Zaubertricks</h2>
+                    <div class="cantrip-list" id="cantripList">
+                        <div style="color: #c8e6c9;">Lade Zaubertricks...</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>Rettungswürfe</h2>
+                    <div id="savingThrowsList"></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Spells & Skills -->
+            <div>
+                <div class="card">
+                    <h2>Vorbereitete Zauber</h2>
+                    <div class="prepared-spells-list" id="preparedSpellsList">
+                        <div style="color: #c8e6c9; text-align: center; padding: 20px;">Lade Zauber...</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h2>Fertigkeiten</h2>
+                    <div id="skillsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spell Detail Modal -->
+    <div class="spell-modal" id="spellModal" onclick="closeSpellModal(event)">
+        <div class="spell-modal-content" onclick="event.stopPropagation()">
+            <div class="spell-modal-header">
+                <div class="spell-modal-title" id="modalSpellName">Zauber Name</div>
+                <button class="spell-modal-close" onclick="closeSpellModal()">✕</button>
+            </div>
+            <div class="spell-modal-meta" id="modalSpellMeta"></div>
+            <div class="spell-modal-description" id="modalSpellDescription"></div>
+        </div>
+    </div>
+
+    <!-- Wild Shape Tooltip -->
+    <div class="wildshape-tooltip" id="wildshapeTooltip"></div>
+
+    <!-- Wild Shape Active Indicator -->
+    <div class="wildshape-indicator" id="wildshapeIndicator">
+        <div class="wildshape-indicator-title">Tiergestalt aktiv</div>
+        <div class="wildshape-indicator-form" id="wildshapeIndicatorName">Wolf</div>
+        <button class="wildshape-indicator-revert" onclick="revertWildShape()">Zurück verwandeln</button>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_URL = 'db_actions.php';
+        let currentCharacterId = 1;
+
+        let characterStats = {
+            level: 1,
+            strength: 10,
+            dexterity: 10,
+            constitution: 10,
+            intelligence: 10,
+            wisdom: 10,
+            charisma: 10,
+            armorClass: 10,
+            currentHP: 8,
+            maxHP: 8
+        };
+
+        // Store original stats for reverting from wildshape
+        let originalStats = null;
+
+        let spellSlots = {};
+        let preparedSpells = [];
+        let allSpells = [];
+        let savingThrowProficiencies = ['intelligence', 'wisdom'];
+        let skillProficiencies = [];
+        let equippedWeapon = null;
+        let wildShapeUses = [false, false]; // Track wild shape uses (false = available, true = used)
+        let currentWildShape = null; // Currently active wild shape form
+
+        // Druid Circle Information
+        const druidCircles = {
+            'Zirkel des Hirten': {
+                description: 'Druiden dieses Zirkels erkennen, dass alle Lebewesen eine Rolle in der natürlichen Welt spielen, widmen sich aber vor allem dem Schutz von Tieren und Feenwesen.',
+                features: [
+                    { level: 2, title: 'Sprache des Waldes', text: 'Du kannst mit Tieren sprechen und Sylvanisch sprechen, lesen und schreiben.' },
+                    { level: 2, title: 'Geist-Totem', text: 'Beschwöre Naturgeister (Bär, Falke oder Einhorn) die Verbündete in ihrer Aura unterstützen.' },
+                    { level: 6, title: 'Mächtiger Beschwörer', text: 'Beschworene Tiere und Feenwesen erhalten +2 TP pro Trefferwürfel und ihre natürlichen Waffen gelten als magisch.' },
+                    { level: 10, title: 'Schutzgeist', text: 'Beschworene Kreaturen regenerieren TP in Höhe der halben Druidenstufe in deiner Totem-Aura.' },
+                    { level: 14, title: 'Treue Beschwörung', text: 'Bei 0 TP wird automatisch "Tiere beschwören" auf Stufe 9 gewirkt.' }
+                ]
+            },
+            'Zirkel des Landes': {
+                description: 'Diese Druiden sind Wächter der alten Wissen und Rituale. Sie erhalten zusätzliche Zauber basierend auf ihrem gewählten Gelände.',
+                features: [
+                    { level: 2, title: 'Bonus-Zaubertrick', text: 'Du erlernst einen zusätzlichen Druiden-Zaubertrick.' },
+                    { level: 2, title: 'Natürliche Erholung', text: 'Regeneriere Zauberplätze während einer kurzen Rast (max. Stufe 6).' },
+                    { level: 3, title: 'Kreis-Zauber', text: 'Erhalte zusätzliche, immer vorbereitete Zauber basierend auf deinem Gelände.' },
+                    { level: 6, title: 'Landgang', text: 'Schwieriges Gelände kostet keine extra Bewegung. Vorteil gegen magisch manipulierte Pflanzen.' },
+                    { level: 10, title: 'Schutz der Natur', text: 'Immunität gegen Gift, Krankheiten und kann nicht von Elementaren/Feen bezaubert werden.' },
+                    { level: 14, title: 'Naturschutzgebiet', text: 'Tiere und Pflanzen müssen WEI-RW bestehen, um dich anzugreifen.' }
+                ]
+            },
+            'Zirkel des Mondes': {
+                description: 'Diese Druiden sind wilde Wächter der Wildnis mit mächtigen Gestaltwandlungsfähigkeiten.',
+                features: [
+                    { level: 2, title: 'Kampf-Gestaltwandlung', text: 'Nutze Tiergestalt als Bonusaktion statt als Aktion.' },
+                    { level: 2, title: 'Kreis-Formen', text: 'Verwandle dich in mächtigere Tiere mit einer HG bis zu deiner Druidenstufe geteilt durch 3.' },
+                    { level: 6, title: 'Ur-Schlag', text: 'Angriffe in Tiergestalt gelten als magisch gegen Widerstände und Immunitäten.' },
+                    { level: 10, title: 'Elementare Gestalt', text: 'Nutze 2 Verwendungen von Tiergestalt, um dich in ein Elementar zu verwandeln.' },
+                    { level: 14, title: 'Tausend Formen', text: 'Wirke "Gestalt ändern" beliebig oft, ohne Zauberplatz zu verbrauchen.' }
+                ]
+            },
+            'Zirkel der Schwerter': {
+                description: 'Krieger-Schamanen, die Nahkampf mit druidischer Magie verbinden. Sie sind Meister des Kampfes und Wächter der Natur.',
+                features: [
+                    { level: 2, title: 'Kampfausbildung', text: 'Beherrschung aller Kriegswaffen und Fertigkeit Nachforschung.' },
+                    { level: 2, title: 'Natürlicher Schutz', text: 'Gewähre dir und Verbündeten temporäre TP als Bonusaktion.' },
+                    { level: 6, title: 'Gebundene Waffe', text: 'Binde eine Waffe, die +1 auf Angriff und Schaden erhält und als Zauberfokus dient.' },
+                    { level: 6, title: 'Zusätzlicher Angriff', text: 'Greife zweimal statt einmal mit deiner gebundenen Waffe an.' },
+                    { level: 10, title: 'Natürliche Widerstandskraft', text: 'Wähle eine Schadensart-Resistenz (änderbar bei langer Rast).' },
+                    { level: 14, title: 'Jäger des Bösen', text: 'Verbrauche 2 Tiergestalten für Vorteil gegen eine Kreaturenart (1 Minute).' }
+                ]
+            },
+            'Zirkel der Sporen': {
+                description: 'Diese Druiden sehen Schönheit im Verfall und Pilze als Symbole von Tod und Wiedergeburt.',
+                features: [
+                    { level: 2, title: 'Halo der Sporen', text: 'Wenn Kreaturen dich bewegen oder in 3m starten, verursachen sie 1W4 Giftschaden (RK negiert).' },
+                    { level: 2, title: 'Symbiotische Einheit', text: 'Nutze Tiergestalt für temporäre TP und verstärkten Sporenschaden (1W6).' },
+                    { level: 6, title: 'Pilzinfestation', text: 'Reaktion: Töte Tier/Humanoiden mit Sporen, um ihn als Zombie zu reanimieren.' },
+                    { level: 10, title: 'Sporenverbreitung', text: 'Dein Halo-Schaden steigt auf 2W4 und Reichweite auf 6m.' },
+                    { level: 14, title: 'Pilzkörper', text: 'Immunität gegen Gift, Furcht, Blindheit und Taubheit. Kritische Treffer gegen dich zählen als normale.' }
+                ]
+            },
+            'Zirkel der Sterne': {
+                description: 'Diese Druiden studieren die Sterne und nutzen ihre himmlische Kraft für Magie und Weissagung.',
+                features: [
+                    { level: 2, title: 'Sternenkarte', text: 'Erhalte den Zaubertrick "Führung" und den Zauber "Leitstrahl" (ohne Zauberplatz nutzbar).' },
+                    { level: 2, title: 'Sternenform', text: 'Verwandle dich in eine von 3 Konstellationen: Bogenschütze (Fernkampf), Kelch (Heilung) oder Drache (Konzentration).' },
+                    { level: 6, title: 'Kosmisches Omen', text: 'Würfle 1W6 nach langer Rast: Gerade = Wohl (+1W6 zu Würfen), Ungerade = Wehe (-1W6 von Würfen).' },
+                    { level: 10, title: 'Funkelnde Konstellationen', text: 'Sternenform-Schaden/Heilung steigt auf 2W8. Drache gewährt 20 Fuß Fluggeschwindigkeit.' },
+                    { level: 14, title: 'Voller Sterne', text: 'In Sternenform: Widerstand gegen Hieb-, Stich- und Wuchtschaden.' }
+                ]
+            },
+            'Zirkel der Träume': {
+                description: 'Verbunden mit der Feenwild heilen diese Druiden Wunden und beschützen helle, fruchtbare Orte, wo Traum und Realität verschwimmen.',
+                features: [
+                    { level: 2, title: 'Balm des Sommergerichts', text: 'Bonusaktion: Heile Verbündete mit 1W6 + Druidenstufe TP pro W6 (Anzahl = WEI-Modifikator).' },
+                    { level: 6, title: 'Heimlicher Pfad', text: 'Bonusaktion: Teleportiere dich bis zu 18m oder tausche Plätze mit willigem Verbündeten.' },
+                    { level: 10, title: 'Versteckter Pfad', text: 'Werde beim Teleportieren unsichtbar bis zum Start deines nächsten Zuges.' },
+                    { level: 14, title: 'Wanderer der Träume', text: 'Wirke "Traum", "Hellsehen" oder "Teleportationskreis" (zu deinem letzten Rastplatz) ohne Material.' }
+                ]
+            },
+            'Zirkel des Wildfeuers': {
+                description: 'Du hast eine Verbindung zu einem Wildfeuer-Geist hergestellt, einem Urwesen der Schöpfung und Zerstörung.',
+                features: [
+                    { level: 2, title: 'Wildfeuer-Geist beschwören', text: 'Nutze Tiergestalt, um deinen Wildfeuer-Geist zu beschwören (2W6 Feuerschaden in 3m).' },
+                    { level: 2, title: 'Verstärkte Bindung', text: 'Erhalte zusätzliche Kreis-Zauber: Brennende Hände, Flammenkugel, Pflanzenwachstum, etc.' },
+                    { level: 6, title: 'Feuersamen', text: 'Reaction: Wenn dein Geist verschwindet, heile 2W6 oder verursache 2W6 Feuerschaden im 9m Radius.' },
+                    { level: 10, title: 'Flammende Wiederbelebung', text: 'Der Geist kann gefallene Verbündete wiederbeleben und Feinde verbrennen.' },
+                    { level: 14, title: 'Loderndes Revival', text: 'Wenn du stirbst, kann dein Geist dich mit halben TP wiederbeleben und verschwindet dann.' }
+                ]
+            }
+        };
+
+        const skillAbilities = {
+            acrobatics: { name: 'Akrobatik', ability: 'dexterity' },
+            animal_handling: { name: 'Tierführung', ability: 'wisdom' },
+            arcana: { name: 'Arkane Kunde', ability: 'intelligence' },
+            athletics: { name: 'Athletik', ability: 'strength' },
+            deception: { name: 'Täuschung', ability: 'charisma' },
+            history: { name: 'Geschichte', ability: 'intelligence' },
+            insight: { name: 'Motiv erkennen', ability: 'wisdom' },
+            intimidation: { name: 'Einschüchtern', ability: 'charisma' },
+            investigation: { name: 'Nachforschung', ability: 'intelligence' },
+            medicine: { name: 'Heilkunde', ability: 'wisdom' },
+            nature: { name: 'Naturkunde', ability: 'intelligence' },
+            perception: { name: 'Wahrnehmung', ability: 'wisdom' },
+            performance: { name: 'Auftreten', ability: 'charisma' },
+            persuasion: { name: 'Überzeugen', ability: 'charisma' },
+            religion: { name: 'Religion', ability: 'intelligence' },
+            sleight_of_hand: { name: 'Fingerfertigkeit', ability: 'dexterity' },
+            stealth: { name: 'Heimlichkeit', ability: 'dexterity' },
+            survival: { name: 'Überlebenskunst', ability: 'wisdom' }
+        };
+
+        const spellSlotsPerLevel = {
+            1: [2], 2: [3], 3: [4, 2], 4: [4, 3], 5: [4, 3, 2],
+            6: [4, 3, 3], 7: [4, 3, 3, 1], 8: [4, 3, 3, 2], 9: [4, 3, 3, 3, 1],
+            10: [4, 3, 3, 3, 2], 11: [4, 3, 3, 3, 2, 1], 12: [4, 3, 3, 3, 2, 1],
+            13: [4, 3, 3, 3, 2, 1, 1], 14: [4, 3, 3, 3, 2, 1, 1], 15: [4, 3, 3, 3, 2, 1, 1, 1],
+            16: [4, 3, 3, 3, 2, 1, 1, 1], 17: [4, 3, 3, 3, 2, 1, 1, 1, 1], 18: [4, 3, 3, 3, 3, 1, 1, 1, 1],
+            19: [4, 3, 3, 3, 3, 2, 1, 1, 1], 20: [4, 3, 3, 3, 3, 2, 2, 1, 1]
+        };
+
+        // Wild Shape Beast Forms Database (Enhanced with full stats)
+        const wildShapeForms = {
+            // CR 0
+            '0': [
+                { name: 'Katze', hp: 2, ac: 12, speed: '12m', cr: '0',
+                  str: 3, dex: 15, con: 10, int: 3, wis: 12, cha: 7,
+                  special: 'Heimlichkeit +4, Scharfes Gehör und Geruchssinn',
+                  attacks: [{ name: 'Klauen', bonus: 0, damage: '1' }] },
+                { name: 'Rabe', hp: 1, ac: 12, speed: '3m, fliegen 15m', cr: '0',
+                  str: 2, dex: 14, con: 8, int: 2, wis: 12, cha: 6,
+                  special: 'Mimikry (Geräusche imitieren)',
+                  attacks: [{ name: 'Schnabel', bonus: 4, damage: '1' }] },
+                { name: 'Spinne', hp: 1, ac: 12, speed: '6m, klettern 6m', cr: '0',
+                  str: 2, dex: 14, con: 8, int: 1, wis: 10, cha: 2,
+                  special: 'Spinnensinne, Spinnenbewegung',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '1 + Gift' }] }
+            ],
+            // CR 1/8
+            '0.125': [
+                { name: 'Adler', hp: 3, ac: 12, speed: '3m, fliegen 18m', cr: '1/8',
+                  str: 6, dex: 15, con: 10, int: 2, wis: 14, cha: 7,
+                  special: 'Scharfer Blick (Vorteil auf Wahrnehmung)',
+                  attacks: [{ name: 'Klauen', bonus: 4, damage: '1d4+2 Hieb' }] },
+                { name: 'Riesenratte', hp: 7, ac: 12, speed: '9m', cr: '1/8',
+                  str: 7, dex: 15, con: 11, int: 2, wis: 10, cha: 4,
+                  special: 'Scharfe Sinne, Rudeltaktik',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '1d4+2 Stich' }] },
+                { name: 'Mastiff', hp: 5, ac: 12, speed: '12m', cr: '1/8',
+                  str: 13, dex: 14, con: 12, int: 3, wis: 12, cha: 7,
+                  special: 'Scharfes Gehör und Geruchssinn',
+                  attacks: [{ name: 'Biss', bonus: 3, damage: '1d6+1 Stich' }] }
+            ],
+            // CR 1/4
+            '0.25': [
+                { name: 'Wolf', hp: 11, ac: 13, speed: '12m', cr: '1/4',
+                  str: 12, dex: 15, con: 12, int: 3, wis: 12, cha: 6,
+                  special: 'Rudeltaktik (Vorteil mit Verbündeten), Scharfer Blick',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '2d4+2 Stich' }] },
+                { name: 'Riesengiftschlange', hp: 11, ac: 14, speed: '9m, schwimmen 9m', cr: '1/4',
+                  str: 10, dex: 18, con: 13, int: 2, wis: 10, cha: 3,
+                  special: 'Giftbiss (RW KON SG 11 oder 3d6 Giftschaden)',
+                  attacks: [{ name: 'Biss', bonus: 6, damage: '1d4+4 Stich + 3d6 Gift' }] },
+                { name: 'Wildschwein', hp: 11, ac: 11, speed: '12m', cr: '1/4',
+                  str: 13, dex: 11, con: 12, int: 2, wis: 9, cha: 5,
+                  special: 'Ansturm (nach 6m Bewegung zusätzlicher Stoßangriff), Tapferkeit',
+                  attacks: [{ name: 'Stoßzahn', bonus: 3, damage: '1d6+1 Hieb' }] },
+                { name: 'Panther', hp: 13, ac: 12, speed: '15m, klettern 12m', cr: '1/4',
+                  str: 14, dex: 15, con: 10, int: 3, wis: 14, cha: 7,
+                  special: 'Anspringen (Ziel niederwerfen nach Sprung), Heimlichkeit +6',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '1d6+2 Stich' }, { name: 'Klauen', bonus: 4, damage: '1d4+2 Hieb' }] },
+                { name: 'Rieseneule', hp: 19, ac: 12, speed: '1,5m, fliegen 18m', cr: '1/4',
+                  str: 13, dex: 15, con: 12, int: 8, wis: 13, cha: 10,
+                  special: 'Überragende Sinne (Vorteil auf Wahrnehmung), Lautloser Flug',
+                  attacks: [{ name: 'Klauen', bonus: 4, damage: '2d6+2 Hieb' }] }
+            ],
+            // CR 1/2
+            '0.5': [
+                { name: 'Riesenziegenspinne', hp: 19, ac: 13, speed: '9m, klettern 9m', cr: '1/2',
+                  str: 14, dex: 16, con: 12, int: 3, wis: 11, cha: 4,
+                  special: 'Netzbewegung (ignoriert Bewegungseinschränkungen von Netzen), Spinnensinne',
+                  attacks: [{ name: 'Biss', bonus: 5, damage: '1d8+3 Stich + 2d8 Gift' }] },
+                { name: 'Reh', hp: 13, ac: 13, speed: '15m', cr: '1/2',
+                  str: 11, dex: 16, con: 11, int: 2, wis: 14, cha: 5,
+                  special: 'Ansturm (nach 6m zusätzlicher Hufangriff)',
+                  attacks: [{ name: 'Geweih', bonus: 5, damage: '1d6+3 Stich' }, { name: 'Hufe', bonus: 5, damage: '1d4+3 Wucht' }] },
+                { name: 'Krokodil', hp: 19, ac: 12, speed: '6m, schwimmen 9m', cr: '1/2',
+                  str: 15, dex: 10, con: 13, int: 2, wis: 10, cha: 5,
+                  special: 'Angriff halten (bei Treffer Ziel festhalten)',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '1d10+2 Stich' }] },
+                { name: 'Riesenwespe', hp: 13, ac: 12, speed: '3m, fliegen 15m', cr: '1/2',
+                  str: 10, dex: 14, con: 10, int: 1, wis: 10, cha: 3,
+                  special: 'Giftiger Stachel (RW KON SG 11 oder 3d6 Giftschaden)',
+                  attacks: [{ name: 'Stachel', bonus: 4, damage: '1d6+2 Stich + 3d6 Gift' }] }
+            ],
+            // CR 1
+            '1': [
+                { name: 'Riesengeier', hp: 22, ac: 10, speed: '3m, fliegen 18m', cr: '1',
+                  str: 15, dex: 10, con: 15, int: 6, wis: 12, cha: 7,
+                  special: 'Rudelstrategie (Vorteil mit Verbündeten), Scharfer Blick',
+                  attacks: [{ name: 'Schnabel', bonus: 4, damage: '2d4+2 Stich' }, { name: 'Klauen', bonus: 4, damage: '2d6+2 Hieb' }] },
+                { name: 'Braunbär', hp: 34, ac: 11, speed: '12m, klettern 9m', cr: '1',
+                  str: 19, dex: 10, con: 16, int: 2, wis: 13, cha: 7,
+                  special: 'Scharfer Geruchssinn (Vorteil auf Wahrnehmung)',
+                  attacks: [{ name: 'Biss', bonus: 6, damage: '1d8+4 Stich' }, { name: 'Klauen', bonus: 6, damage: '2d6+4 Hieb' }] },
+                { name: 'Riesenhyäne', hp: 45, ac: 12, speed: '15m', cr: '1',
+                  str: 16, dex: 14, con: 14, int: 2, wis: 12, cha: 7,
+                  special: 'Niederwerfen (bei Treffer Ziel niederstrecken), Rampage (Bonusaktion bei Kill)',
+                  attacks: [{ name: 'Biss', bonus: 5, damage: '2d6+3 Stich' }] },
+                { name: 'Riesenkröte', hp: 39, ac: 11, speed: '6m, schwimmen 12m', cr: '1',
+                  str: 15, dex: 13, con: 13, int: 2, wis: 10, cha: 3,
+                  special: 'Amphibisch (atmet Luft und Wasser), Verschlingen (kleine Kreaturen)',
+                  attacks: [{ name: 'Biss', bonus: 4, damage: '1d10+2 Stich + Greifen' }] },
+                { name: 'Riesenkrake', hp: 52, ac: 11, speed: '3m, schwimmen 18m', cr: '1',
+                  str: 17, dex: 13, con: 13, int: 4, wis: 10, cha: 4,
+                  special: 'Tintenwolke (verschleiert 6m Radius), Unterwasseratmung',
+                  attacks: [{ name: 'Tentakel', bonus: 5, damage: '1d6+3 Wucht' }, { name: 'Tinte', bonus: 0, damage: 'Blind' }] }
+            ],
+            // CR 2 (Moon Druids Level 6+)
+            '2': [
+                { name: 'Riesenkrokodil', hp: 85, ac: 14, speed: '9m, schwimmen 15m', cr: '2',
+                  str: 21, dex: 9, con: 17, int: 2, wis: 10, cha: 7,
+                  special: 'Angriff halten (hält Ziel fest), Mehrfachangriff',
+                  attacks: [{ name: 'Biss', bonus: 8, damage: '3d10+5 Stich' }, { name: 'Schwanz', bonus: 8, damage: '2d8+5 Wucht' }] },
+                { name: 'Säbelzahntiger', hp: 52, ac: 12, speed: '12m', cr: '2',
+                  str: 18, dex: 14, con: 15, int: 3, wis: 12, cha: 8,
+                  special: 'Anspringen (15m Bewegung = Ziel niederwerfen), Mehrfachangriff',
+                  attacks: [{ name: 'Biss', bonus: 6, damage: '1d10+4 Stich' }, { name: 'Klauen', bonus: 6, damage: '2d6+4 Hieb' }] },
+                { name: 'Plesiosaurus', hp: 68, ac: 13, speed: '6m, schwimmen 12m', cr: '2',
+                  str: 18, dex: 15, con: 16, int: 2, wis: 12, cha: 5,
+                  special: 'Unterwasseratmung (nur im Wasser)',
+                  attacks: [{ name: 'Biss', bonus: 6, damage: '3d6+4 Stich' }] },
+                { name: 'Riesenconstrictor', hp: 60, ac: 12, speed: '9m, schwimmen 9m', cr: '2',
+                  str: 19, dex: 14, con: 12, int: 1, wis: 10, cha: 3,
+                  special: 'Umschlingen (hält Ziel fest), Würgen (automatischer Schaden)',
+                  attacks: [{ name: 'Biss', bonus: 6, damage: '2d6+4 Stich' }, { name: 'Umschlingen', bonus: 6, damage: '2d8+4 Wucht + Greifen' }] }
+            ],
+            // CR 3 (Moon Druids Level 9+)
+            '3': [
+                { name: 'Ankylosaurus', hp: 68, ac: 15, speed: '9m', cr: '3',
+                  str: 19, dex: 11, con: 15, int: 2, wis: 12, cha: 5,
+                  special: 'Schwanzangriff (niederstrecken bei Treffer), Mehrfachangriff',
+                  attacks: [{ name: 'Schwanz', bonus: 7, damage: '4d6+4 Wucht' }] },
+                { name: 'Riesenskorpion', hp: 52, ac: 15, speed: '12m', cr: '3',
+                  str: 15, dex: 13, con: 15, int: 1, wis: 9, cha: 3,
+                  special: 'Mehrfachangriff (Scheren + Stachel), Giftiger Stachel (4d10 Gift)',
+                  attacks: [{ name: 'Schere', bonus: 4, damage: '1d8+2 Wucht + Greifen' }, { name: 'Stachel', bonus: 4, damage: '1d10+2 Stich + 4d10 Gift' }] }
+            ]
+        };
+
+        // API Functions
+        async function apiRequest(action, method = 'GET', data = null) {
+            const url = method === 'GET' && data
+                ? `${API_URL}?action=${action}&${new URLSearchParams(data).toString()}`
+                : `${API_URL}?action=${action}`;
+
+            const options = {
+                method: method,
+                headers: {'Content-Type': 'application/json'}
+            };
+
+            if (method !== 'GET' && data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+
+                if (!result.success && result.error) {
+                    console.error('API Error:', result.error);
+                    return null;
+                }
+
+                return result;
+            } catch (error) {
+                console.error('Request failed:', error);
+                return null;
+            }
+        }
+
+        async function loadCharacter() {
+            const result = await apiRequest('character', 'GET', {id: currentCharacterId});
+
+            if (result && result.data) {
+                const char = result.data;
+
+                document.getElementById('characterName').textContent = char.name || 'Druide';
+                document.getElementById('charLevel').textContent = char.level || 1;
+                document.getElementById('charCircle').textContent = getCircleName(char.druid_circle);
+
+                characterStats.level = char.level || 1;
+                characterStats.strength = char.strength || 10;
+                characterStats.dexterity = char.dexterity || 10;
+                characterStats.constitution = char.constitution || 10;
+                characterStats.intelligence = char.intelligence || 10;
+                characterStats.wisdom = char.wisdom || 10;
+                characterStats.charisma = char.charisma || 10;
+                characterStats.armorClass = char.armor_class || 10;
+                characterStats.currentHP = char.current_hp || 8;
+                characterStats.maxHP = char.max_hp || 8;
+
+                spellSlots = char.spell_slots || {};
+                preparedSpells = char.prepared_spells || [];
+                savingThrowProficiencies = char.saving_throw_proficiencies || ['intelligence', 'wisdom'];
+                skillProficiencies = char.skill_proficiencies || [];
+
+                // Load equipped weapon from equipped_items.mainhand (preferred) or equipped_weapon field (fallback)
+                if (char.equipped_items && char.equipped_items.mainhand) {
+                    equippedWeapon = char.equipped_items.mainhand;
+                } else {
+                    equippedWeapon = char.equipped_weapon || null;
+                }
+
+                console.log('Equipped weapon loaded:', equippedWeapon);
+
+                updateDisplay();
+            }
+        }
+
+        async function loadSpells() {
+            const level = characterStats.level || 1;
+            let maxSpellLevel = Math.ceil(level / 2);
+            if (level === 1) maxSpellLevel = 1;
+
+            const result = await apiRequest('spells', 'GET', {max_spell_level: maxSpellLevel});
+
+            if (result && result.data) {
+                allSpells = result.data;
+                renderPreparedSpells();
+                renderCantrips();
+            }
+        }
+
+        function getCircleName(circle) {
+            if (!circle) return '-';
+
+            // Map English/database values to German circle names
+            const circles = {
+                'land': 'Zirkel des Landes',
+                'moon': 'Zirkel des Mondes',
+                'dreams': 'Zirkel der Träume',
+                'shepherd': 'Zirkel des Hirten',
+                'spores': 'Zirkel der Sporen',
+                'wildfire': 'Zirkel des Wildfeuers',
+                'stars': 'Zirkel der Sterne',
+                'swords': 'Zirkel der Schwerter'
+            };
+
+            // If already in German format, return as is
+            if (circle.startsWith('Zirkel')) {
+                return circle;
+            }
+
+            return circles[circle] || circle;
+        }
+
+        function calculateModifier(score) {
+            return Math.floor((score - 10) / 2);
+        }
+
+        function calculateProficiencyBonus(level) {
+            return Math.ceil(level / 4) + 1;
+        }
+
+        function updateDisplay() {
+            // Update abilities
+            const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+            const shortNames = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+
+            abilities.forEach((ability, index) => {
+                const value = characterStats[ability];
+                const mod = calculateModifier(value);
+                const short = shortNames[index];
+
+                document.getElementById(`${short}Value`).textContent = value;
+                document.getElementById(`${short}Mod`).textContent = (mod >= 0 ? '+' : '') + mod;
+            });
+
+            // Update combat values
+            const profBonus = calculateProficiencyBonus(characterStats.level);
+            const wisMod = calculateModifier(characterStats.wisdom);
+            const dexMod = calculateModifier(characterStats.dexterity);
+
+            document.getElementById('profBonus').textContent = '+' + profBonus;
+            document.getElementById('acValue').textContent = characterStats.armorClass;
+            document.getElementById('initiativeValue').textContent = (dexMod >= 0 ? '+' : '') + dexMod;
+            document.getElementById('spellDC').textContent = 8 + profBonus + wisMod;
+            document.getElementById('spellAttack').textContent = '+' + (profBonus + wisMod);
+
+            // Update speed - show wildshape speed if transformed
+            if (currentWildShape) {
+                document.getElementById('speedValue').textContent = currentWildShape.speed;
+            } else {
+                document.getElementById('speedValue').textContent = '9 m';
+            }
+
+            // Update HP
+            document.getElementById('currentHP').textContent = characterStats.currentHP;
+            document.getElementById('maxHP').textContent = characterStats.maxHP;
+
+            // Update spell slots
+            renderSpellSlots();
+
+            // Update saving throws
+            renderSavingThrows();
+
+            // Update skills
+            renderSkills();
+
+            // Update weapon
+            renderWeapon();
+
+            // Update druid circle info
+            renderCircleInfo();
+
+            // Update wild shape
+            renderWildShape();
+        }
+
+        function renderCircleInfo() {
+            const circleInfoDiv = document.getElementById('circleInfo');
+            const circleTitleDiv = document.getElementById('circleTitle');
+            const circleDescDiv = document.getElementById('circleDescription');
+            const circleFeaturesDiv = document.getElementById('circleFeatures');
+
+            // Get druid circle from character
+            const druidCircle = document.getElementById('charCircle').textContent;
+
+            if (!druidCircle || druidCircle === '-' || !druidCircles[druidCircle]) {
+                circleInfoDiv.style.display = 'none';
+                return;
+            }
+
+            const circleData = druidCircles[druidCircle];
+            circleInfoDiv.style.display = 'block';
+            circleTitleDiv.textContent = druidCircle;
+            circleDescDiv.textContent = circleData.description;
+
+            // Filter features based on current level
+            const currentLevel = characterStats.level || 1;
+            const availableFeatures = circleData.features.filter(f => f.level <= currentLevel);
+
+            circleFeaturesDiv.innerHTML = availableFeatures.map(feature => `
+                <div class="circle-feature">
+                    <div class="circle-feature-title">Stufe ${feature.level}: ${feature.title}</div>
+                    <div class="circle-feature-text">${feature.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderWeapon() {
+            const weaponNameEl = document.getElementById('weaponName');
+            const weaponStatsEl = document.getElementById('weaponStats');
+            const attackBonusEl = document.getElementById('weaponAttackBonus');
+            const weaponDamageEl = document.getElementById('weaponDamage');
+
+            // If in wildshape, show beast attacks
+            if (currentWildShape && currentWildShape.attacks && currentWildShape.attacks.length > 0) {
+                const attacks = currentWildShape.attacks;
+
+                if (attacks.length === 1) {
+                    // Single attack
+                    weaponNameEl.textContent = `🐾 ${attacks[0].name}`;
+                    weaponStatsEl.style.display = 'grid';
+                    attackBonusEl.textContent = (attacks[0].bonus >= 0 ? '+' : '') + attacks[0].bonus;
+                    weaponDamageEl.textContent = attacks[0].damage;
+                } else {
+                    // Multiple attacks
+                    weaponNameEl.textContent = `🐾 ${attacks[0].name} (Mehrfachangriff)`;
+                    weaponStatsEl.style.display = 'grid';
+                    weaponStatsEl.innerHTML = '';
+
+                    attacks.forEach(attack => {
+                        const attackDiv = document.createElement('div');
+                        attackDiv.className = 'weapon-stat';
+                        attackDiv.innerHTML = `
+                            <div class="weapon-stat-label">${attack.name}</div>
+                            <div class="weapon-stat-value">${(attack.bonus >= 0 ? '+' : '')}${attack.bonus} / ${attack.damage}</div>
+                        `;
+                        weaponStatsEl.appendChild(attackDiv);
+                    });
+                }
+                return;
+            }
+
+            // Normal weapon display
+            if (!equippedWeapon || !equippedWeapon.name) {
+                weaponNameEl.textContent = 'Keine Waffe ausgerüstet';
+                weaponStatsEl.style.display = 'none';
+                return;
+            }
+
+            weaponNameEl.textContent = equippedWeapon.name;
+            weaponStatsEl.style.display = 'grid';
+
+            // Calculate attack bonus
+            const profBonus = calculateProficiencyBonus(characterStats.level);
+            let abilityMod = 0;
+
+            // Determine which ability to use based on weapon properties
+            if (equippedWeapon.finesse) {
+                // Finesse weapons use the higher of STR or DEX
+                const strMod = calculateModifier(characterStats.strength);
+                const dexMod = calculateModifier(characterStats.dexterity);
+                abilityMod = Math.max(strMod, dexMod);
+            } else if (equippedWeapon.ranged) {
+                // Ranged weapons use DEX
+                abilityMod = calculateModifier(characterStats.dexterity);
+            } else {
+                // Melee weapons use STR
+                abilityMod = calculateModifier(characterStats.strength);
+            }
+
+            // Add proficiency bonus if proficient
+            const attackBonus = abilityMod + (equippedWeapon.proficient ? profBonus : 0);
+
+            // Reset to standard layout for normal weapons
+            weaponStatsEl.innerHTML = `
+                <div class="weapon-stat">
+                    <div class="weapon-stat-label">Angriffswurf</div>
+                    <div class="weapon-stat-value" id="weaponAttackBonus">${(attackBonus >= 0 ? '+' : '')}${attackBonus}</div>
+                </div>
+                <div class="weapon-stat">
+                    <div class="weapon-stat-label">Schaden</div>
+                    <div class="weapon-stat-value" id="weaponDamage"></div>
+                </div>
+            `;
+
+            // Display damage (e.g., "1d6+3 Hieb")
+            const damageBonus = abilityMod >= 0 ? '+' + abilityMod : abilityMod;
+            const damageDisplay = equippedWeapon.damage_dice + damageBonus + ' ' + (equippedWeapon.damage_type || '');
+            document.getElementById('weaponDamage').textContent = damageDisplay;
+        }
+
+        function renderSpellSlots() {
+            const container = document.getElementById('spellSlotsContainer');
+            const level = characterStats.level || 1;
+            const slots = spellSlotsPerLevel[level] || [2];
+
+            let html = '';
+            slots.forEach((count, index) => {
+                const slotLevel = index + 1;
+                const circles = spellSlots[slotLevel] || Array(count).fill(false);
+
+                html += `
+                    <div class="slot-compact">
+                        <div class="level">Stufe ${slotLevel}</div>
+                        <div class="circles">
+                            ${circles.map((used, i) => `
+                                <div class="slot-circle-mini ${used ? 'used' : ''}"
+                                     onclick="toggleSlot(${slotLevel}, ${i})"></div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderCantrips() {
+            const container = document.getElementById('cantripList');
+            const cantrips = allSpells.filter(s => s.level === 0 && preparedSpells.includes(s.id));
+
+            if (cantrips.length === 0) {
+                container.innerHTML = '<div style="color: #c8e6c9;">Keine Zaubertricks vorbereitet</div>';
+                return;
+            }
+
+            let html = '';
+            cantrips.forEach(spell => {
+                html += `<div class="cantrip-badge" onclick="showSpellDetails(${spell.id})" title="Klicken für Details">${spell.name_de}</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderPreparedSpells() {
+            const container = document.getElementById('preparedSpellsList');
+            const prepared = allSpells.filter(s => s.level > 0 && preparedSpells.includes(s.id));
+
+            if (prepared.length === 0) {
+                container.innerHTML = '<div style="color: #c8e6c9; text-align: center; padding: 20px;">Keine Zauber vorbereitet</div>';
+                return;
+            }
+
+            let html = '';
+            prepared.forEach(spell => {
+                const schoolName = spell.school_de || spell.school || '';
+                html += `
+                    <div class="spell-compact" onclick="showSpellDetails(${spell.id})" title="Klicken für Details">
+                        <div class="name">${spell.name_de}</div>
+                        <div class="level">Stufe ${spell.level} - ${schoolName}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderSavingThrows() {
+            const container = document.getElementById('savingThrowsList');
+            const abilities = [
+                { name: 'Stärke', key: 'strength' },
+                { name: 'Geschicklichkeit', key: 'dexterity' },
+                { name: 'Konstitution', key: 'constitution' },
+                { name: 'Intelligenz', key: 'intelligence' },
+                { name: 'Weisheit', key: 'wisdom' },
+                { name: 'Charisma', key: 'charisma' }
+            ];
+
+            const profBonus = calculateProficiencyBonus(characterStats.level);
+
+            let html = '';
+            abilities.forEach(({ name, key }) => {
+                const mod = calculateModifier(characterStats[key]);
+                const isProficient = savingThrowProficiencies.includes(key);
+                const bonus = mod + (isProficient ? profBonus : 0);
+
+                html += `
+                    <div class="stat-compact ${isProficient ? 'proficient' : ''}">
+                        <span class="stat-name">${name}</span>
+                        <span class="stat-value">${bonus >= 0 ? '+' : ''}${bonus}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderSkills() {
+            const container = document.getElementById('skillsList');
+            const profBonus = calculateProficiencyBonus(characterStats.level);
+
+            let html = '';
+            Object.entries(skillAbilities).forEach(([key, skill]) => {
+                const mod = calculateModifier(characterStats[skill.ability]);
+                const isProficient = skillProficiencies.includes(key);
+                const bonus = mod + (isProficient ? profBonus : 0);
+
+                html += `
+                    <div class="stat-compact ${isProficient ? 'proficient' : ''}">
+                        <span class="stat-name">${skill.name}</span>
+                        <span class="stat-value">${bonus >= 0 ? '+' : ''}${bonus}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleSlot(level, index) {
+            if (!spellSlots[level]) {
+                spellSlots[level] = [];
+            }
+            spellSlots[level][index] = !spellSlots[level][index];
+            renderSpellSlots();
+            saveSpellSlots();
+        }
+
+        async function saveSpellSlots() {
+            await apiRequest('update_spell_slots', 'POST', {
+                char_id: currentCharacterId,
+                spell_slots: spellSlots
+            });
+        }
+
+        function changeHP(delta) {
+            characterStats.currentHP = Math.max(0, Math.min(characterStats.maxHP, characterStats.currentHP + delta));
+            document.getElementById('currentHP').textContent = characterStats.currentHP;
+            saveCharacterHP();
+        }
+
+        async function saveCharacterHP() {
+            const data = {
+                id: currentCharacterId,
+                name: document.getElementById('characterName').textContent,
+                level: characterStats.level,
+                druid_circle: 'land',
+                strength: characterStats.strength,
+                dexterity: characterStats.dexterity,
+                constitution: characterStats.constitution,
+                intelligence: characterStats.intelligence,
+                wisdom: characterStats.wisdom,
+                charisma: characterStats.charisma,
+                armor_class: characterStats.armorClass,
+                current_hp: characterStats.currentHP,
+                max_hp: characterStats.maxHP,
+                saving_throw_proficiencies: savingThrowProficiencies,
+                skill_proficiencies: skillProficiencies
+            };
+
+            await apiRequest('update_character', 'POST', data);
+        }
+
+        async function longRest() {
+            const result = await apiRequest('long_rest', 'POST', {char_id: currentCharacterId});
+
+            if (result && result.success) {
+                // Reset wild shape uses on long rest
+                wildShapeUses = [false, false];
+                await saveWildShape();
+                await loadCharacter();
+                alert('Lange Rast abgeschlossen! Alle Zauberplätze, HP und Tiergestalt-Verwendungen wiederhergestellt.');
+            }
+        }
+
+        async function shortRest() {
+            // Reset wild shape uses on short rest
+            wildShapeUses = [false, false];
+            await saveWildShape();
+            renderWildShape();
+            alert('Kurze Rast abgeschlossen! Tiergestalt-Verwendungen wiederhergestellt.');
+        }
+
+        // Wild Shape Functions
+        function getWildShapeMaxCR(level, circle) {
+            const isMoonCircle = circle && (circle.includes('Mond') || circle === 'moon');
+
+            if (isMoonCircle) {
+                if (level >= 9) return Math.floor(level / 3);
+                if (level >= 6) return 2;
+                return 1;
+            }
+
+            // Standard druids
+            if (level >= 8) return 1;
+            if (level >= 4) return 0.5;
+            return 0.25;
+        }
+
+        function getWildShapeDuration(level) {
+            return Math.floor(level / 2);
+        }
+
+        function getAvailableWildShapeForms(level, circle) {
+            const maxCR = getWildShapeMaxCR(level, circle);
+            const canSwim = level >= 4;
+            const canFly = level >= 8;
+
+            let forms = [];
+
+            // Add all forms up to maxCR
+            Object.keys(wildShapeForms).forEach(cr => {
+                const crValue = parseFloat(cr);
+                if (crValue <= maxCR) {
+                    wildShapeForms[cr].forEach(form => {
+                        // Check swimming/flying restrictions
+                        const hasSwim = form.speed.includes('schwimmen');
+                        const hasFly = form.speed.includes('fliegen');
+
+                        if (hasSwim && !canSwim) return;
+                        if (hasFly && !canFly) return;
+
+                        forms.push(form);
+                    });
+                }
+            });
+
+            return forms;
+        }
+
+        function renderWildShape() {
+            const level = characterStats.level || 1;
+            const circle = document.getElementById('charCircle').textContent;
+
+            // Hide if level < 2
+            if (level < 2) {
+                document.getElementById('wildShapeCard').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('wildShapeCard').style.display = 'block';
+
+            // Render uses circles
+            const circlesContainer = document.getElementById('wildshapeCircles');
+            circlesContainer.innerHTML = wildShapeUses.map((used, index) =>
+                `<div class="wildshape-circle ${used ? 'used' : ''}" onclick="toggleWildShapeUse(${index})"></div>`
+            ).join('');
+
+            // Update duration and max CR
+            const duration = getWildShapeDuration(level);
+            document.getElementById('wildshapeDuration').textContent = `${duration} ${duration === 1 ? 'Stunde' : 'Stunden'}`;
+
+            const maxCR = getWildShapeMaxCR(level, circle);
+            const crDisplay = maxCR === 0.125 ? '1/8' : maxCR === 0.25 ? '1/4' : maxCR === 0.5 ? '1/2' : maxCR;
+            document.getElementById('wildshapeMaxCR').textContent = crDisplay;
+
+            // Render available forms
+            const forms = getAvailableWildShapeForms(level, circle);
+            const formsContainer = document.getElementById('wildshapeFormsList');
+
+            if (forms.length === 0) {
+                formsContainer.innerHTML = '<div style="color: #c8e6c9; padding: 10px;">Keine Formen verfügbar auf dieser Stufe</div>';
+                return;
+            }
+
+            formsContainer.innerHTML = forms.map((form, index) => {
+                const crDisplay = form.cr === '0.125' ? '1/8' : form.cr === '0.25' ? '1/4' : form.cr === '0.5' ? '1/2' : form.cr;
+                return `
+                    <div class="wildshape-form"
+                         onclick="transformWildShape(${JSON.stringify(form).replace(/"/g, '&quot;')})"
+                         onmouseenter="showWildShapeTooltip(event, ${JSON.stringify(form).replace(/"/g, '&quot;')})"
+                         onmouseleave="hideWildShapeTooltip()">
+                        <div class="wildshape-form-header">
+                            <div class="wildshape-form-name">${form.name}</div>
+                            <div class="wildshape-form-cr">HG ${crDisplay}</div>
+                        </div>
+                        <div class="wildshape-form-stats">
+                            <div class="wildshape-form-stat">
+                                <div class="wildshape-form-stat-label">TP</div>
+                                <div class="wildshape-form-stat-value">${form.hp}</div>
+                            </div>
+                            <div class="wildshape-form-stat">
+                                <div class="wildshape-form-stat-label">RK</div>
+                                <div class="wildshape-form-stat-value">${form.ac}</div>
+                            </div>
+                            <div class="wildshape-form-stat">
+                                <div class="wildshape-form-stat-label">Tempo</div>
+                                <div class="wildshape-form-stat-value">${form.speed}</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.8em; color: #c8e6c9; margin-top: 5px; font-style: italic;">${form.special}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show Wild Shape Tooltip
+        function showWildShapeTooltip(event, form) {
+            const tooltip = document.getElementById('wildshapeTooltip');
+
+            // Build attacks HTML
+            let attacksHTML = '';
+            if (form.attacks && form.attacks.length > 0) {
+                attacksHTML = form.attacks.map(attack => `
+                    <div class="wildshape-tooltip-attack">
+                        <strong>${attack.name}:</strong> ${attack.bonus >= 0 ? '+' : ''}${attack.bonus} Angriff, ${attack.damage} Schaden
+                    </div>
+                `).join('');
+            }
+
+            // Build abilities HTML
+            const abilities = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'];
+            const abilityValues = [form.str, form.dex, form.con, form.int, form.wis, form.cha];
+            const abilitiesHTML = abilities.map((ability, index) => {
+                const mod = Math.floor((abilityValues[index] - 10) / 2);
+                return `
+                    <div class="wildshape-tooltip-ability">
+                        <div class="wildshape-tooltip-ability-label">${ability}</div>
+                        <div>${abilityValues[index]} (${mod >= 0 ? '+' : ''}${mod})</div>
+                    </div>
+                `;
+            }).join('');
+
+            tooltip.innerHTML = `
+                <div class="wildshape-tooltip-header">${form.name}</div>
+                <div class="wildshape-tooltip-section">
+                    <div class="wildshape-tooltip-section-title">Grundwerte</div>
+                    <div>TP: ${form.hp} | RK: ${form.ac} | Tempo: ${form.speed}</div>
+                </div>
+                <div class="wildshape-tooltip-section">
+                    <div class="wildshape-tooltip-section-title">Attribute</div>
+                    <div class="wildshape-tooltip-abilities">
+                        ${abilitiesHTML}
+                    </div>
+                </div>
+                ${attacksHTML ? `
+                    <div class="wildshape-tooltip-section">
+                        <div class="wildshape-tooltip-section-title">Angriffe</div>
+                        <div class="wildshape-tooltip-attacks">
+                            ${attacksHTML}
+                        </div>
+                    </div>
+                ` : ''}
+                <div class="wildshape-tooltip-section">
+                    <div class="wildshape-tooltip-section-title">Besondere Fähigkeiten</div>
+                    <div style="font-size: 0.85em; font-style: italic;">${form.special}</div>
+                </div>
+            `;
+
+            // Position tooltip near mouse
+            const rect = event.currentTarget.getBoundingClientRect();
+            tooltip.style.left = (rect.right + 10) + 'px';
+            tooltip.style.top = rect.top + 'px';
+            tooltip.classList.add('show');
+        }
+
+        // Hide Wild Shape Tooltip
+        function hideWildShapeTooltip() {
+            const tooltip = document.getElementById('wildshapeTooltip');
+            tooltip.classList.remove('show');
+        }
+
+        // Transform into Wild Shape
+        function transformWildShape(form) {
+            // Check if wild shape uses are available
+            const availableUses = wildShapeUses.filter(used => !used).length;
+            if (availableUses === 0) {
+                alert('Keine Tiergestalt-Verwendungen mehr verfügbar! Mache eine kurze oder lange Rast.');
+                return;
+            }
+
+            // Consume one wild shape use
+            const firstAvailable = wildShapeUses.indexOf(false);
+            if (firstAvailable !== -1) {
+                wildShapeUses[firstAvailable] = true;
+            }
+
+            // Store original stats
+            if (!originalStats) {
+                originalStats = { ...characterStats };
+            }
+
+            // Transform stats
+            currentWildShape = form;
+            characterStats.strength = form.str;
+            characterStats.dexterity = form.dex;
+            characterStats.constitution = form.con;
+            characterStats.intelligence = form.int;
+            characterStats.wisdom = form.wis;
+            characterStats.charisma = form.cha;
+            characterStats.armorClass = form.ac;
+            characterStats.maxHP = form.hp;
+            characterStats.currentHP = form.hp; // Start with full HP in new form
+
+            // Apply brown theme
+            document.body.classList.add('wildshape-active');
+
+            // Show indicator
+            const indicator = document.getElementById('wildshapeIndicator');
+            const indicatorName = document.getElementById('wildshapeIndicatorName');
+            indicatorName.textContent = form.name;
+            indicator.classList.add('show');
+
+            // Update display
+            updateDisplay();
+            renderWildShape();
+
+            // Hide tooltip
+            hideWildShapeTooltip();
+        }
+
+        // Revert from Wild Shape
+        function revertWildShape() {
+            if (!currentWildShape || !originalStats) {
+                return;
+            }
+
+            // Restore original stats
+            characterStats.strength = originalStats.strength;
+            characterStats.dexterity = originalStats.dexterity;
+            characterStats.constitution = originalStats.constitution;
+            characterStats.intelligence = originalStats.intelligence;
+            characterStats.wisdom = originalStats.wisdom;
+            characterStats.charisma = originalStats.charisma;
+            characterStats.armorClass = originalStats.armorClass;
+            characterStats.maxHP = originalStats.maxHP;
+
+            // Restore HP (minimum 1 HP when reverting)
+            characterStats.currentHP = Math.max(1, originalStats.currentHP);
+
+            // Clear wild shape
+            currentWildShape = null;
+            originalStats = null;
+
+            // Remove brown theme
+            document.body.classList.remove('wildshape-active');
+
+            // Hide indicator
+            document.getElementById('wildshapeIndicator').classList.remove('show');
+
+            // Update display
+            updateDisplay();
+            renderWildShape();
+        }
+
+        function toggleWildShapeUse(index) {
+            wildShapeUses[index] = !wildShapeUses[index];
+            renderWildShape();
+            saveWildShape();
+        }
+
+        async function saveWildShape() {
+            // You can save this to character data if needed
+            // For now, it resets on page reload (which is fine for short rest mechanics)
+            console.log('Wild Shape uses:', wildShapeUses);
+        }
+
+        // Spell Detail Modal Functions
+        function showSpellDetails(spellId) {
+            const spell = allSpells.find(s => s.id === spellId);
+            if (!spell) {
+                console.error('Spell not found:', spellId);
+                return;
+            }
+
+            // Set spell name
+            document.getElementById('modalSpellName').textContent = spell.name_de || spell.name_en || 'Unbekannter Zauber';
+
+            // Build meta information
+            const schoolName = spell.school_de || spell.school || '-';
+            const castingTime = spell.casting_time_de || spell.casting_time || '-';
+            const range = spell.range_de || spell.range || '-';
+            const duration = spell.duration_de || spell.duration || '-';
+            const components = spell.components || '-';
+            const concentration = spell.concentration ? 'Ja' : 'Nein';
+
+            const metaHTML = `
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Stufe</div>
+                    <div class="spell-meta-value">${spell.level === 0 ? 'Zaubertrick' : 'Stufe ' + spell.level}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Schule</div>
+                    <div class="spell-meta-value">${schoolName}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Zeitaufwand</div>
+                    <div class="spell-meta-value">${castingTime}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Reichweite</div>
+                    <div class="spell-meta-value">${range}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Komponenten</div>
+                    <div class="spell-meta-value">${components}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Dauer</div>
+                    <div class="spell-meta-value">${duration}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Konzentration</div>
+                    <div class="spell-meta-value">${concentration}</div>
+                </div>
+                <div class="spell-meta-item">
+                    <div class="spell-meta-label">Ritual</div>
+                    <div class="spell-meta-value">${spell.ritual ? 'Ja' : 'Nein'}</div>
+                </div>
+            `;
+
+            document.getElementById('modalSpellMeta').innerHTML = metaHTML;
+
+            // Set description
+            const description = spell.description_de || spell.description_en || 'Keine Beschreibung verfügbar.';
+
+            // Convert **text** to bold HTML
+            const formattedDescription = description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            document.getElementById('modalSpellDescription').innerHTML = formattedDescription;
+
+            // Show modal
+            document.getElementById('spellModal').classList.add('active');
+        }
+
+        function closeSpellModal(event) {
+            // If event is provided and clicking on modal content, don't close
+            if (event && event.target !== event.currentTarget) {
+                return;
+            }
+            document.getElementById('spellModal').classList.remove('active');
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSpellModal();
+            }
+        });
+
+        // Initialize
+        async function init() {
+            await loadCharacter();
+            await loadSpells();
+        }
+
+        init();
+    </script>
+</body>
+</html>

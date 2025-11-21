@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charakter bearbeiten - Druiden Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
+            color: #e8f5e9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #a5d6a7;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: rgba(165, 214, 167, 0.2);
+            color: #c8e6c9;
+        }
+
+        nav a.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #c8e6c9;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            color: #a5d6a7;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4caf50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c8e6c9;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #4caf50;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8f5e9;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #66bb6a;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #4caf50;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8f5e9;
+            font-size: 16px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #66bb6a;
+        }
+
+        /* Stat controls */
+        .stat-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            flex: 1;
+            font-weight: 600;
+            color: #c8e6c9;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4caf50;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .stat-modifier {
+            font-size: 18px;
+            color: #81c784;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .stat-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-minus {
+            background: #e57373;
+            color: white;
+        }
+
+        .btn-minus:hover {
+            background: #ef5350;
+            transform: scale(1.05);
+        }
+
+        .btn-plus {
+            background: #81c784;
+            color: white;
+        }
+
+        .btn-plus:hover {
+            background: #66bb6a;
+            transform: scale(1.05);
+        }
+
+        .btn-primary {
+            background: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-back {
+            background: #757575;
+            color: white;
+            padding: 12px 24px;
+            width: 100%;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .btn-back:hover {
+            background: #616161;
+        }
+
+        /* Grid for abilities */
+        .abilities-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        /* HP and AC section */
+        .combat-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .stat-control {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .stat-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .combat-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-primary, .btn-back {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .save-indicator {
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .save-indicator.success {
+            background: rgba(76, 175, 80, 0.3);
+            color: #c8e6c9;
+            display: block;
+        }
+
+        .save-indicator.error {
+            background: rgba(229, 115, 115, 0.3);
+            color: #ffcdd2;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="character.html" class="active">Charakter</a>
+        <a href="spells.html">Zauber</a>
+        <a href="equipment.html">Ausrüstung</a>
+    </nav>
+
+    <div class="container">
+        <h1>Charakter bearbeiten</h1>
+
+        <!-- Basic Info Section -->
+        <div class="section">
+            <h2>Grundinformationen</h2>
+
+            <div class="form-group">
+                <label for="charName">Charaktername</label>
+                <input type="text" id="charName" placeholder="Name des Druiden">
+            </div>
+
+            <div class="stat-control">
+                <div class="stat-label">Stufe</div>
+                <div class="stat-value" id="levelValue">1</div>
+                <div class="stat-buttons">
+                    <button class="btn btn-minus" onclick="changeLevel(-1)">-</button>
+                    <button class="btn btn-plus" onclick="changeLevel(1)">+</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="druidCircle">Druiden-Zirkel</label>
+                <select id="druidCircle">
+                    <option value="land">Zirkel des Landes</option>
+                    <option value="moon">Zirkel des Mondes</option>
+                    <option value="dreams">Zirkel der Träume</option>
+                    <option value="shepherd">Zirkel des Hirten</option>
+                    <option value="spores">Zirkel der Sporen</option>
+                    <option value="wildfire">Zirkel des Wildfeuers</option>
+                    <option value="stars">Zirkel der Sterne</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Ability Scores Section -->
+        <div class="section">
+            <h2>Attributswerte</h2>
+            <div class="abilities-grid">
+                <div class="stat-control">
+                    <div class="stat-label">Stärke (STR)</div>
+                    <div class="stat-value" id="strengthValue">10</div>
+                    <div class="stat-modifier" id="strengthMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('strength', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('strength', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="stat-control">
+                    <div class="stat-label">Geschicklichkeit (DEX)</div>
+                    <div class="stat-value" id="dexterityValue">10</div>
+                    <div class="stat-modifier" id="dexterityMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('dexterity', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('dexterity', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="stat-control">
+                    <div class="stat-label">Konstitution (CON)</div>
+                    <div class="stat-value" id="constitutionValue">10</div>
+                    <div class="stat-modifier" id="constitutionMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('constitution', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('constitution', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="stat-control">
+                    <div class="stat-label">Intelligenz (INT)</div>
+                    <div class="stat-value" id="intelligenceValue">10</div>
+                    <div class="stat-modifier" id="intelligenceMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('intelligence', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('intelligence', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="stat-control">
+                    <div class="stat-label">Weisheit (WIS)</div>
+                    <div class="stat-value" id="wisdomValue">10</div>
+                    <div class="stat-modifier" id="wisdomMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('wisdom', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('wisdom', 1)">+</button>
+                    </div>
+                </div>
+
+                <div class="stat-control">
+                    <div class="stat-label">Charisma (CHA)</div>
+                    <div class="stat-value" id="charismaValue">10</div>
+                    <div class="stat-modifier" id="charismaMod">+0</div>
+                    <div class="stat-buttons">
+                        <button class="btn btn-minus" onclick="changeStat('charisma', -1)">-</button>
+                        <button class="btn btn-plus" onclick="changeStat('charisma', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combat Stats Section -->
+        <div class="section">
+            <h2>Kampfwerte</h2>
+            <div class="combat-stats">
+                <div>
+                    <div class="stat-control">
+                        <div class="stat-label">Rüstungsklasse (AC)</div>
+                        <div class="stat-value" id="acValue">10</div>
+                        <div class="stat-buttons">
+                            <button class="btn btn-minus" onclick="changeAC(-1)">-</button>
+                            <button class="btn btn-plus" onclick="changeAC(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="stat-control">
+                        <div class="stat-label">Max Trefferpunkte</div>
+                        <div class="stat-value" id="maxHPValue">8</div>
+                        <div class="stat-buttons">
+                            <button class="btn btn-minus" onclick="changeMaxHP(-1)">-</button>
+                            <button class="btn btn-plus" onclick="changeMaxHP(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Buttons -->
+        <div class="section">
+            <button class="btn btn-primary" onclick="saveAllChanges()">Änderungen speichern</button>
+            <button class="btn btn-back" onclick="goBack()">Zurück zum Dashboard</button>
+            <div class="save-indicator" id="saveIndicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+        const CHARACTER_ID = 1;
+
+        let characterStats = {
+            level: 1,
+            strength: 10,
+            dexterity: 10,
+            constitution: 10,
+            intelligence: 10,
+            wisdom: 10,
+            charisma: 10,
+            armorClass: 10,
+            maxHP: 8,
+            currentHP: 8
+        };
+
+        let characterName = '';
+        let druidCircle = 'land';
+
+        // Load character data on page load
+        window.addEventListener('DOMContentLoaded', loadCharacter);
+
+        async function loadCharacter() {
+            try {
+                const response = await fetch(`${API_URL}?action=character&id=${CHARACTER_ID}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const char = data.data;
+
+                    // Update character stats
+                    characterStats = {
+                        level: parseInt(char.level),
+                        strength: parseInt(char.strength),
+                        dexterity: parseInt(char.dexterity),
+                        constitution: parseInt(char.constitution),
+                        intelligence: parseInt(char.intelligence),
+                        wisdom: parseInt(char.wisdom),
+                        charisma: parseInt(char.charisma),
+                        armorClass: parseInt(char.armor_class),
+                        maxHP: parseInt(char.max_hp),
+                        currentHP: parseInt(char.current_hp)
+                    };
+
+                    characterName = char.name;
+                    druidCircle = char.druid_circle;
+
+                    // Update UI
+                    document.getElementById('charName').value = characterName;
+                    document.getElementById('druidCircle').value = druidCircle;
+
+                    updateAllStats();
+                }
+            } catch (error) {
+                console.error('Error loading character:', error);
+                showSaveIndicator('Fehler beim Laden des Charakters', 'error');
+            }
+        }
+
+        function changeLevel(delta) {
+            characterStats.level = Math.max(1, Math.min(20, characterStats.level + delta));
+            updateAllStats();
+        }
+
+        function changeStat(statName, delta) {
+            characterStats[statName] = Math.max(1, Math.min(30, characterStats[statName] + delta));
+            updateAllStats();
+        }
+
+        function changeAC(delta) {
+            characterStats.armorClass = Math.max(0, Math.min(30, characterStats.armorClass + delta));
+            updateAllStats();
+        }
+
+        function changeMaxHP(delta) {
+            characterStats.maxHP = Math.max(1, characterStats.maxHP + delta);
+            // Adjust current HP if it exceeds new max
+            if (characterStats.currentHP > characterStats.maxHP) {
+                characterStats.currentHP = characterStats.maxHP;
+            }
+            updateAllStats();
+        }
+
+        function updateAllStats() {
+            // Update level
+            document.getElementById('levelValue').textContent = characterStats.level;
+
+            // Update ability scores and modifiers
+            const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+            abilities.forEach(ability => {
+                const value = characterStats[ability];
+                const modifier = Math.floor((value - 10) / 2);
+
+                document.getElementById(`${ability}Value`).textContent = value;
+                document.getElementById(`${ability}Mod`).textContent = modifier >= 0 ? `+${modifier}` : modifier;
+            });
+
+            // Update combat stats
+            document.getElementById('acValue').textContent = characterStats.armorClass;
+            document.getElementById('maxHPValue').textContent = characterStats.maxHP;
+        }
+
+        async function saveAllChanges() {
+            try {
+                // Get current form values
+                characterName = document.getElementById('charName').value || 'Unbenannter Druide';
+                druidCircle = document.getElementById('druidCircle').value;
+
+                const updateData = {
+                    id: CHARACTER_ID,
+                    name: characterName,
+                    level: characterStats.level,
+                    druid_circle: druidCircle,
+                    strength: characterStats.strength,
+                    dexterity: characterStats.dexterity,
+                    constitution: characterStats.constitution,
+                    intelligence: characterStats.intelligence,
+                    wisdom: characterStats.wisdom,
+                    charisma: characterStats.charisma,
+                    armor_class: characterStats.armorClass,
+                    max_hp: characterStats.maxHP,
+                    current_hp: characterStats.currentHP
+                };
+
+                const response = await fetch(`${API_URL}?action=update_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSaveIndicator('Änderungen erfolgreich gespeichert!', 'success');
+                } else {
+                    showSaveIndicator('Fehler beim Speichern', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving character:', error);
+                showSaveIndicator('Fehler beim Speichern', 'error');
+            }
+        }
+
+        function showSaveIndicator(message, type) {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.textContent = message;
+            indicator.className = `save-indicator ${type}`;
+
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 3000);
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Add event listeners for name and circle changes
+        document.getElementById('charName').addEventListener('change', () => {
+            characterName = document.getElementById('charName').value;
+        });
+
+        document.getElementById('druidCircle').addEventListener('change', () => {
+            druidCircle = document.getElementById('druidCircle').value;
+        });
+    </script>
+</body>
+</html>
