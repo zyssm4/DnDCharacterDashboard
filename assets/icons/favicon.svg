@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- D20 Dice - Fantasy Style -->
+
+  <!-- Main body - icosahedron front face -->
+  <polygon points="32,4 54,20 54,44 32,60 10,44 10,20" fill="#1a1a2e"/>
+
+  <!-- Top triangular face -->
+  <polygon points="32,4 54,20 32,28 10,20" fill="#2d2d44"/>
+
+  <!-- Left face -->
+  <polygon points="10,20 32,28 32,48 10,44" fill="#3d3d5c"/>
+
+  <!-- Right face -->
+  <polygon points="54,20 32,28 32,48 54,44" fill="#252538"/>
+
+  <!-- Bottom face -->
+  <polygon points="32,48 54,44 32,60 10,44" fill="#1f1f32"/>
+
+  <!-- Inner highlight lines -->
+  <line x1="32" y1="4" x2="32" y2="28" stroke="#6366f1" stroke-width="1.5"/>
+  <line x1="10" y1="20" x2="32" y2="28" stroke="#6366f1" stroke-width="1.5"/>
+  <line x1="54" y1="20" x2="32" y2="28" stroke="#6366f1" stroke-width="1.5"/>
+  <line x1="32" y1="28" x2="32" y2="48" stroke="#8b5cf6" stroke-width="1"/>
+  <line x1="10" y1="44" x2="32" y2="48" stroke="#8b5cf6" stroke-width="1"/>
+  <line x1="54" y1="44" x2="32" y2="48" stroke="#8b5cf6" stroke-width="1"/>
+
+  <!-- Outer edges glow -->
+  <polygon points="32,4 54,20 54,44 32,60 10,44 10,20" fill="none" stroke="#a78bfa" stroke-width="2"/>
+
+  <!-- Number 20 in center -->
+  <text x="32" y="42" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e0e7ff" text-anchor="middle">20</text>
+
+  <!-- Corner gems/highlights -->
+  <circle cx="32" cy="4" r="2" fill="#f472b6"/>
+  <circle cx="10" cy="20" r="2" fill="#f472b6"/>
+  <circle cx="54" cy="20" r="2" fill="#f472b6"/>
+  <circle cx="10" cy="44" r="2" fill="#c084fc"/>
+  <circle cx="54" cy="44" r="2" fill="#c084fc"/>
+  <circle cx="32" cy="60" r="2" fill="#c084fc"/>
+
+  <!-- Sparkle effects -->
+  <circle cx="42" cy="12" r="1.5" fill="#fef08a" opacity="0.8"/>
+  <circle cx="48" cy="32" r="1" fill="#fef08a" opacity="0.6"/>
+</svg>

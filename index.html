@@ -3,49 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Druiden Tracker - Weiterleitung...</title>
+    <title>D&D Character Dashboard - Loading...</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
-            color: #e8f5e9;
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
-        .loading {
+
+        .loading-container {
             text-align: center;
+            animation: fadeIn 0.5s ease-out;
         }
-        .loading h1 {
-            color: #a5d6a7;
-            margin-bottom: 20px;
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 30px;
         }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(165, 214, 167, 0.3);
-            border-top-color: #4caf50;
+
+        .d20-icon {
+            width: 120px;
+            height: 120px;
+            animation: float 3s ease-in-out infinite, spin 8s linear infinite;
+            filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.5));
+        }
+
+        .glow-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 160px;
+            border: 2px solid var(--primary-color);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+            animation: pulse-ring 2s ease-out infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary-light), var(--accent-rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-bottom: 40px;
+        }
+
+        .loading-bar-container {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin: 0 auto 20px;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-rose));
+            border-radius: var(--radius-full);
+            animation: loading 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(400%);
+            }
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        /* Fantasy decorative elements */
+        .corner-decoration {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+        }
+
+        .corner-decoration.top-left {
+            top: 20px;
+            left: 20px;
+            border-top: 3px solid var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .corner-decoration.top-right {
+            top: 20px;
+            right: 20px;
+            border-top: 3px solid var(--secondary-color);
+            border-right: 3px solid var(--secondary-color);
+        }
+
+        .corner-decoration.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-bottom: 3px solid var(--secondary-color);
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .corner-decoration.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-bottom: 3px solid var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        /* Particle effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            animation: float-up 4s ease-in infinite;
+            opacity: 0;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="loading">
-        <h1>🌿 Druiden Tracker</h1>
-        <div class="spinner"></div>
-        <p style="margin-top: 20px;">Lade Dashboard...</p>
+    <!-- Decorative corners -->
+    <div class="corner-decoration top-left"></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+    <div class="corner-decoration bottom-right"></div>
+
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="loading-container">
+        <div class="logo-container">
+            <div class="glow-ring"></div>
+            <img src="assets/icons/favicon.svg" alt="D20" class="d20-icon">
+        </div>
+
+        <h1 class="title">D&D Character Dashboard</h1>
+        <p class="subtitle">Your Adventure Awaits</p>
+
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+
+        <div class="status-text">
+            <span class="status-dot"></span>
+            Preparing your character sheet...
+        </div>
     </div>
 
     <script>
-        // Redirect to dashboard immediately
-        window.location.href = 'dashboard.html';
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['var(--primary-light)', 'var(--secondary-light)', 'var(--accent-rose)', 'var(--accent-gold)'];
+
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                container.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // Redirect to class selection after a brief loading animation
+        setTimeout(() => {
+            window.location.href = 'class-selection.html';
+        }, 2000);
     </script>
 </body>
 </html>

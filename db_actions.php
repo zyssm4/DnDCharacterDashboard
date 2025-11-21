@@ -66,17 +66,36 @@ if ($method === 'GET') {
         // Get character data
         case 'character':
             $charId = $_GET['id'] ?? null;
-            
-            if (!$charId) {
+            $class = $_GET['class'] ?? null;
+
+            // Allow fetching by class OR by ID
+            if (!$charId && !$class) {
                 http_response_code(400);
-                echo json_encode(['error' => 'Character ID required']);
+                echo json_encode(['error' => 'Character ID or class required']);
                 exit;
             }
-            
-            $stmt = $pdo->prepare("
-                SELECT * FROM characters WHERE id = ?
-            ");
-            $stmt->execute([$charId]);
+
+            if ($charId) {
+                $stmt = $pdo->prepare("
+                    SELECT * FROM characters WHERE id = ?
+                ");
+                $stmt->execute([$charId]);
+            } else {
+                // Map English class names to German DB names
+                $classMap = [
+                    'druid' => 'Druide',
+                    'rogue' => 'Schurke',
+                    'bard' => 'Barde',
+                    'wizard' => 'Magier',
+                    'paladin' => 'Paladin'
+                ];
+                $dbClass = $classMap[$class] ?? $class;
+
+                $stmt = $pdo->prepare("
+                    SELECT * FROM characters WHERE class = ? LIMIT 1
+                ");
+                $stmt->execute([$dbClass]);
+            }
             $character = $stmt->fetch();
             
             if (!$character) {
@@ -97,29 +116,182 @@ if ($method === 'GET') {
             echo json_encode(['success' => true, 'data' => $character]);
             break;
             
-        // Get all spells for druids
+        // Get all spells for a class
         case 'spells':
             $level = $_GET['level'] ?? null;
             $maxSpellLevel = $_GET['max_spell_level'] ?? 9;
-            
-            $query = "SELECT * FROM spells WHERE class LIKE '%Druide%'";
-            
+            $class = $_GET['class'] ?? 'druid';
+
+            // Map English class names to German DB names for spell filtering
+            $classMap = [
+                'druid' => 'Druide',
+                'rogue' => 'Schurke',
+                'bard' => 'Barde',
+                'wizard' => 'Magier',
+                'paladin' => 'Paladin'
+            ];
+            $dbClass = $classMap[$class] ?? $class;
+
+            $query = "SELECT * FROM spells WHERE class LIKE :class";
+            $params = [':class' => '%' . $dbClass . '%'];
+
             if ($maxSpellLevel !== null) {
                 $query .= " AND (level = 0 OR level <= :max_spell_level)";
+                $params[':max_spell_level'] = $maxSpellLevel;
             }
-            
+
             $query .= " ORDER BY level, name_de";
-            
+
             $stmt = $pdo->prepare($query);
-            
-            if ($maxSpellLevel !== null) {
-                $stmt->bindParam(':max_spell_level', $maxSpellLevel, PDO::PARAM_INT);
+
+            foreach ($params as $key => $value) {
+                if ($key === ':max_spell_level') {
+                    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($key, $value);
+                }
             }
-            
+
             $stmt->execute();
             $spells = $stmt->fetchAll();
-            
+
             echo json_encode(['success' => true, 'data' => $spells]);
+            break;
+
+        // Get class features for a specific class and level
+        case 'class_features':
+            $class = $_GET['class'] ?? null;
+            $level = $_GET['level'] ?? 1;
+
+            if (!$class) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Class parameter required']);
+                exit;
+            }
+
+            // Return class-specific features based on level
+            $features = [];
+
+            // Define features for each class
+            $classFeatures = [
+                'druid' => [
+                    1 => ['Druidic', 'Spellcasting'],
+                    2 => ['Wild Shape', 'Druid Circle'],
+                    4 => ['Wild Shape Improvement', 'Ability Score Improvement'],
+                    6 => ['Druid Circle Feature'],
+                    8 => ['Wild Shape Improvement', 'Ability Score Improvement'],
+                    10 => ['Druid Circle Feature'],
+                    12 => ['Ability Score Improvement'],
+                    14 => ['Druid Circle Feature'],
+                    16 => ['Ability Score Improvement'],
+                    18 => ['Timeless Body', 'Beast Spells'],
+                    19 => ['Ability Score Improvement'],
+                    20 => ['Archdruid']
+                ],
+                'rogue' => [
+                    1 => ['Expertise', 'Sneak Attack', 'Thieves\' Cant'],
+                    2 => ['Cunning Action'],
+                    3 => ['Roguish Archetype'],
+                    4 => ['Ability Score Improvement'],
+                    5 => ['Uncanny Dodge'],
+                    6 => ['Expertise'],
+                    7 => ['Evasion'],
+                    8 => ['Ability Score Improvement'],
+                    9 => ['Roguish Archetype Feature'],
+                    10 => ['Ability Score Improvement'],
+                    11 => ['Reliable Talent'],
+                    12 => ['Ability Score Improvement'],
+                    13 => ['Roguish Archetype Feature'],
+                    14 => ['Blindsense'],
+                    15 => ['Slippery Mind'],
+                    16 => ['Ability Score Improvement'],
+                    17 => ['Roguish Archetype Feature'],
+                    18 => ['Elusive'],
+                    19 => ['Ability Score Improvement'],
+                    20 => ['Stroke of Luck']
+                ],
+                'bard' => [
+                    1 => ['Spellcasting', 'Bardic Inspiration (d6)'],
+                    2 => ['Jack of All Trades', 'Song of Rest (d6)'],
+                    3 => ['Bard College', 'Expertise'],
+                    4 => ['Ability Score Improvement'],
+                    5 => ['Bardic Inspiration (d8)', 'Font of Inspiration'],
+                    6 => ['Countercharm', 'Bard College Feature'],
+                    7 => [],
+                    8 => ['Ability Score Improvement'],
+                    9 => ['Song of Rest (d8)'],
+                    10 => ['Bardic Inspiration (d10)', 'Expertise', 'Magical Secrets'],
+                    11 => [],
+                    12 => ['Ability Score Improvement'],
+                    13 => ['Song of Rest (d10)'],
+                    14 => ['Magical Secrets', 'Bard College Feature'],
+                    15 => ['Bardic Inspiration (d12)'],
+                    16 => ['Ability Score Improvement'],
+                    17 => ['Song of Rest (d12)'],
+                    18 => ['Magical Secrets'],
+                    19 => ['Ability Score Improvement'],
+                    20 => ['Superior Inspiration']
+                ],
+                'wizard' => [
+                    1 => ['Spellcasting', 'Arcane Recovery'],
+                    2 => ['Arcane Tradition'],
+                    3 => [],
+                    4 => ['Ability Score Improvement'],
+                    5 => [],
+                    6 => ['Arcane Tradition Feature'],
+                    7 => [],
+                    8 => ['Ability Score Improvement'],
+                    9 => [],
+                    10 => ['Arcane Tradition Feature'],
+                    11 => [],
+                    12 => ['Ability Score Improvement'],
+                    13 => [],
+                    14 => ['Arcane Tradition Feature'],
+                    15 => [],
+                    16 => ['Ability Score Improvement'],
+                    17 => [],
+                    18 => ['Spell Mastery'],
+                    19 => ['Ability Score Improvement'],
+                    20 => ['Signature Spells']
+                ],
+                'paladin' => [
+                    1 => ['Divine Sense', 'Lay on Hands'],
+                    2 => ['Fighting Style', 'Spellcasting', 'Divine Smite'],
+                    3 => ['Divine Health', 'Sacred Oath'],
+                    4 => ['Ability Score Improvement'],
+                    5 => ['Extra Attack'],
+                    6 => ['Aura of Protection'],
+                    7 => ['Sacred Oath Feature'],
+                    8 => ['Ability Score Improvement'],
+                    9 => [],
+                    10 => ['Aura of Courage'],
+                    11 => ['Improved Divine Smite'],
+                    12 => ['Ability Score Improvement'],
+                    13 => [],
+                    14 => ['Cleansing Touch'],
+                    15 => ['Sacred Oath Feature'],
+                    16 => ['Ability Score Improvement'],
+                    17 => [],
+                    18 => ['Aura Improvements'],
+                    19 => ['Ability Score Improvement'],
+                    20 => ['Sacred Oath Feature']
+                ]
+            ];
+
+            // Get all features up to the character's level
+            $classData = $classFeatures[$class] ?? [];
+            for ($i = 1; $i <= $level; $i++) {
+                if (isset($classData[$i])) {
+                    foreach ($classData[$i] as $feature) {
+                        $features[] = [
+                            'level' => $i,
+                            'name' => $feature
+                        ];
+                    }
+                }
+            }
+
+            echo json_encode(['success' => true, 'data' => $features]);
             break;
             
         // Get prepared spells for character
@@ -587,7 +759,73 @@ else if ($method === 'POST') {
 
             echo json_encode(['success' => true, 'message' => 'Armor class updated']);
             break;
-            
+
+        // Update character HP
+        case 'update_hp':
+            $charId = $input['char_id'] ?? null;
+            $currentHp = $input['current_hp'] ?? null;
+            $maxHp = $input['max_hp'] ?? null;
+
+            if (!$charId) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID required']);
+                exit;
+            }
+
+            $updates = [];
+            $params = [];
+
+            if ($currentHp !== null) {
+                $updates[] = "current_hp = ?";
+                $params[] = $currentHp;
+            }
+
+            if ($maxHp !== null) {
+                $updates[] = "max_hp = ?";
+                $params[] = $maxHp;
+            }
+
+            if (empty($updates)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'No HP values provided']);
+                exit;
+            }
+
+            $params[] = $charId;
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET " . implode(', ', $updates) . ", updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute($params);
+
+            echo json_encode(['success' => true, 'message' => 'HP updated']);
+            break;
+
+        // Update class-specific resources (bardic inspiration, lay on hands, etc.)
+        case 'update_class_resource':
+            $charId = $input['char_id'] ?? null;
+            $resourceName = $input['resource_name'] ?? null;
+            $resourceValue = $input['resource_value'] ?? null;
+
+            if (!$charId || !$resourceName) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Character ID and resource name required']);
+                exit;
+            }
+
+            // Store in a JSON field for flexibility
+            $stmt = $pdo->prepare("
+                UPDATE characters
+                SET class_resources = JSON_SET(COALESCE(class_resources, '{}'), ?, ?),
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ");
+            $stmt->execute(['$.' . $resourceName, $resourceValue, $charId]);
+
+            echo json_encode(['success' => true, 'message' => 'Class resource updated']);
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Invalid action']);

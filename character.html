@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charakter bearbeiten - Druiden Tracker</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
         * {
             margin: 0;
@@ -289,9 +291,46 @@
             color: #ffcdd2;
             display: block;
         }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #f44336; }
+        .notification.warning { background: #ff9800; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
+        <div class="loading-spinner"></div>
+    </div>
+
     <nav>
         <a href="dashboard.html">Dashboard</a>
         <a href="character.html" class="active">Charakter</a>
@@ -438,7 +477,24 @@
 
     <script>
         const API_URL = 'db_actions.php';
-        const CHARACTER_ID = 1;
+        const CHARACTER_ID = new URLSearchParams(window.location.search).get('id') || 1;
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
 
         let characterStats = {
             level: 1,
@@ -461,6 +517,7 @@
 
         async function loadCharacter() {
             try {
+                showLoading();
                 const response = await fetch(`${API_URL}?action=character&id=${CHARACTER_ID}`);
                 const data = await response.json();
 
@@ -489,10 +546,14 @@
                     document.getElementById('druidCircle').value = druidCircle;
 
                     updateAllStats();
+                } else {
+                    throw new Error(data.error || 'Charakter konnte nicht geladen werden');
                 }
             } catch (error) {
                 console.error('Error loading character:', error);
-                showSaveIndicator('Fehler beim Laden des Charakters', 'error');
+                showNotification(error.message || 'Fehler beim Laden des Charakters', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -541,6 +602,7 @@
 
         async function saveAllChanges() {
             try {
+                showLoading();
                 // Get current form values
                 characterName = document.getElementById('charName').value || 'Unbenannter Druide';
                 druidCircle = document.getElementById('druidCircle').value;
@@ -572,13 +634,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showSaveIndicator('Änderungen erfolgreich gespeichert!', 'success');
+                    showNotification('Änderungen erfolgreich gespeichert!');
                 } else {
-                    showSaveIndicator('Fehler beim Speichern', 'error');
+                    throw new Error(data.error || 'Fehler beim Speichern');
                 }
             } catch (error) {
                 console.error('Error saving character:', error);
-                showSaveIndicator('Fehler beim Speichern', 'error');
+                showNotification(error.message || 'Fehler beim Speichern', 'error');
+            } finally {
+                hideLoading();
             }
         }
 

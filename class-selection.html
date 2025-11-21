@@ -3,51 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D&D 5e Multi-Klassen Tracker</title>
-    <link rel="stylesheet" href="assets/icons/class-icons.svg">
+    <title>D&D 5e - Choose Your Class</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            color: #e8e8e8;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            min-height: 100vh;
         }
 
         .header {
             text-align: center;
             margin-bottom: 50px;
+            animation: fadeIn 0.6s ease-out;
         }
 
         h1 {
             font-size: 3em;
             background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #dfe6e9);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 10px;
-            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .subtitle {
             font-size: 1.2em;
-            color: #a8a8a8;
+            color: var(--text-secondary);
             font-weight: 300;
         }
 
         .class-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             max-width: 1400px;
             width: 100%;
@@ -55,14 +54,15 @@
         }
 
         .class-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(30, 30, 46, 0.9), rgba(20, 20, 32, 0.95));
+            border-radius: var(--radius-xl);
             padding: 30px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 2px solid transparent;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .class-card::before {
@@ -74,18 +74,36 @@
             bottom: 0;
             background: linear-gradient(135deg, var(--class-color-1), var(--class-color-2));
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity var(--transition-normal);
             z-index: 0;
+        }
+
+        .class-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--class-color-1), var(--class-color-2));
+            border-radius: var(--radius-xl);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
         }
 
         .class-card:hover::before {
             opacity: 0.15;
         }
 
+        .class-card:hover::after {
+            opacity: 1;
+        }
+
         .class-card:hover {
             transform: translateY(-10px) scale(1.02);
-            border-color: var(--class-color-1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--class-color-1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+                        0 0 30px var(--class-color-1);
         }
 
         .class-content {
@@ -98,12 +116,13 @@
             height: 80px;
             margin: 0 auto 15px;
             display: block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            transition: all var(--transition-normal);
         }
 
         .class-card:hover .class-icon {
-            transform: scale(1.1);
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
         }
 
         .class-name {
@@ -111,19 +130,22 @@
             font-weight: bold;
             margin-bottom: 10px;
             color: var(--class-color-1);
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .class-description {
             font-size: 0.9em;
-            color: #c8c8c8;
+            color: var(--text-secondary);
             line-height: 1.6;
             margin-bottom: 15px;
+            text-align: center;
         }
 
         .class-features {
             font-size: 0.85em;
-            color: #a8a8a8;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
             padding-top: 15px;
             margin-top: 15px;
         }
@@ -132,7 +154,23 @@
             color: var(--class-color-2);
         }
 
-        /* Klassenspezifische Farben */
+        .feature-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feature-label {
+            color: var(--text-muted);
+        }
+
+        .feature-value {
+            color: var(--class-color-2);
+            font-weight: 600;
+        }
+
+        /* Class-specific accent colors */
         .druid {
             --class-color-1: #66bb6a;
             --class-color-2: #a5d6a7;
@@ -158,10 +196,21 @@
             --class-color-2: #fff9c4;
         }
 
+        /* Class color accent bar */
+        .class-accent-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--class-color-1), var(--class-color-2));
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
         .footer {
             margin-top: 50px;
             text-align: center;
-            color: #666;
+            color: var(--text-muted);
             font-size: 0.9em;
         }
 
@@ -179,29 +228,30 @@
             }
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #a8a8a8;
-        }
-
         .class-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, var(--success-color), #66BB6A);
             color: white;
             padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75em;
+            border-radius: var(--radius-full);
+            font-size: 0.7em;
             font-weight: bold;
             z-index: 10;
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
-            animation: pulse 2s infinite;
+            animation: badge-pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        @keyframes pulse {
+        .class-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        @keyframes badge-pulse {
             0%, 100% {
                 transform: scale(1);
                 box-shadow: 0 4px 12px rgba(76, 175, 80, 0.5);
@@ -212,22 +262,95 @@
             }
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
+        /* Status message styling */
+        .status-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideDown 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-message.success {
+            background: linear-gradient(135deg, var(--success-color), #66BB6A);
+            color: white;
+        }
+
+        .status-message.warning {
+            background: linear-gradient(135deg, var(--warning-color), #FFB300);
+            color: white;
+        }
+
+        .status-message.info {
+            background: linear-gradient(135deg, var(--info-color), #64B5F6);
+            color: white;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(4px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner-large {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        /* Card entry animations */
+        .class-card {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .class-card.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner-large"></div>
+            <p style="color: var(--text-primary);">Loading character...</p>
+        </div>
+    </div>
+
     <div class="header">
-        <h1>🎲 D&D 5e Character Tracker 🎲</h1>
-        <p class="subtitle">Wähle deine Klasse</p>
+        <h1>D&D 5e Character Tracker</h1>
+        <p class="subtitle">Choose Your Class</p>
     </div>
 
     <!-- SVG Icons laden -->
@@ -238,96 +361,149 @@
     <div class="class-grid">
         <!-- Druide -->
         <div class="class-card druid" onclick="selectClass('druid')">
+            <div class="class-accent-bar"></div>
             <div class="class-content">
                 <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-druid"></use></svg>
                 <div class="class-name">Druide</div>
                 <div class="class-description">
-                    Wächter der Natur und Meister der Gestaltwandlung. Du kannst dich in mächtige Tiere verwandeln und die Kräfte der Natur nutzen.
+                    Guardian of nature and master of shapeshifting. Transform into powerful beasts and harness the forces of nature.
                 </div>
                 <div class="class-features">
-                    <strong>Hauptattribut:</strong> Weisheit<br>
-                    <strong>Besonderheit:</strong> Wild Shape, Zauber bis Stufe 9<br>
-                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                    <div class="feature-row">
+                        <span class="feature-label">Primary Stat</span>
+                        <span class="feature-value">Wisdom</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Special</span>
+                        <span class="feature-value">Wild Shape</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Spellcasting</span>
+                        <span class="feature-value">Full Caster</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Schurke -->
         <div class="class-card rogue" onclick="selectClass('rogue')">
+            <div class="class-accent-bar"></div>
             <div class="class-content">
                 <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-rogue"></use></svg>
                 <div class="class-name">Schurke</div>
                 <div class="class-description">
-                    Meister der Heimlichkeit und des Hinterhältigen Angriffs. Perfekt für Piraten, Diebe und alle, die aus dem Schatten zuschlagen.
+                    Master of stealth and sneak attacks. Perfect for pirates, thieves, and those who strike from the shadows.
                 </div>
                 <div class="class-features">
-                    <strong>Hauptattribut:</strong> Geschicklichkeit<br>
-                    <strong>Besonderheit:</strong> Sneak Attack, Cunning Action, Expertise<br>
-                    <strong>Zauberwirker:</strong> Kein Zauber
+                    <div class="feature-row">
+                        <span class="feature-label">Primary Stat</span>
+                        <span class="feature-value">Dexterity</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Special</span>
+                        <span class="feature-value">Sneak Attack</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Spellcasting</span>
+                        <span class="feature-value">None</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Barde -->
         <div class="class-card bard" onclick="selectClass('bard')">
+            <div class="class-accent-bar"></div>
             <div class="class-content">
                 <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-bard"></use></svg>
                 <div class="class-name">Barde</div>
                 <div class="class-description">
-                    Charismatischer Künstler und vielseitiger Zauberwirker. Inspiriere deine Verbündeten und lerne Zauber aus allen Klassen!
+                    Charismatic artist and versatile spellcaster. Inspire your allies and learn spells from any class!
                 </div>
                 <div class="class-features">
-                    <strong>Hauptattribut:</strong> Charisma<br>
-                    <strong>Besonderheit:</strong> Bardic Inspiration, Jack of All Trades, Magical Secrets<br>
-                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                    <div class="feature-row">
+                        <span class="feature-label">Primary Stat</span>
+                        <span class="feature-value">Charisma</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Special</span>
+                        <span class="feature-value">Bardic Inspiration</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Spellcasting</span>
+                        <span class="feature-value">Full Caster</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Magier -->
         <div class="class-card wizard" onclick="selectClass('wizard')">
+            <div class="class-accent-bar"></div>
             <div class="class-content">
                 <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-wizard"></use></svg>
                 <div class="class-name">Magier</div>
                 <div class="class-description">
-                    Gelehrter der arkanen Künste mit der größten Zauberliste. Nutze dein Zauberbuch, um die mächtigsten Zauber zu wirken.
+                    Scholar of arcane arts with the largest spell list. Use your spellbook to cast the most powerful spells.
                 </div>
                 <div class="class-features">
-                    <strong>Hauptattribut:</strong> Intelligenz<br>
-                    <strong>Besonderheit:</strong> Zauberbuch, Ritual Casting, Arcane Recovery<br>
-                    <strong>Zauberwirker:</strong> Volle Zauberkraft
+                    <div class="feature-row">
+                        <span class="feature-label">Primary Stat</span>
+                        <span class="feature-value">Intelligence</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Special</span>
+                        <span class="feature-value">Spellbook</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Spellcasting</span>
+                        <span class="feature-value">Full Caster</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Paladin -->
         <div class="class-card paladin" onclick="selectClass('paladin')">
+            <div class="class-accent-bar"></div>
             <div class="class-content">
                 <svg class="class-icon"><use href="assets/icons/class-icons.svg#icon-paladin"></use></svg>
                 <div class="class-name">Paladin</div>
                 <div class="class-description">
-                    Heiliger Krieger mit göttlicher Macht. Heile Verbündete mit Handauflegen und vernichte Feinde mit göttlichen Schlägen!
+                    Holy warrior with divine power. Heal allies with lay on hands and smite enemies with divine strikes!
                 </div>
                 <div class="class-features">
-                    <strong>Hauptattribut:</strong> Stärke & Charisma<br>
-                    <strong>Besonderheit:</strong> Lay on Hands, Divine Smite, Auras<br>
-                    <strong>Zauberwirker:</strong> Halber Zauberwirker (bis Stufe 5)
+                    <div class="feature-row">
+                        <span class="feature-label">Primary Stat</span>
+                        <span class="feature-value">Strength & Charisma</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Special</span>
+                        <span class="feature-value">Divine Smite</span>
+                    </div>
+                    <div class="feature-row">
+                        <span class="feature-label">Spellcasting</span>
+                        <span class="feature-value">Half Caster</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>D&D 5e Multi-Class Character Tracker &copy; 2024</p>
+        <p>D&D 5e Multi-Class Character Tracker - 2024</p>
     </div>
 
     <script>
         const API_URL = 'db_actions.php';
 
         async function selectClass(className) {
-            console.log('Klasse ausgewählt:', className);
+            console.log('Class selected:', className);
 
-            // Add visual feedback
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            // Add visual feedback to card
             const card = document.querySelector(`.class-card.${className}`);
             if (card) {
                 card.style.opacity = '0.5';
@@ -335,29 +511,29 @@
             }
 
             try {
-                // Prüfe ob bereits ein Charakter für diese Klasse existiert
+                // Check if character exists for this class
                 const response = await fetch(`${API_URL}?action=check_character&class=${className}`);
                 const result = await response.json();
 
                 if (result.success && result.exists) {
-                    // Charakter existiert - gehe zum Dashboard
-                    console.log('Charakter gefunden:', result.data);
-                    showMessage(`Lade ${result.data.name}...`, 'success');
+                    // Character exists - go to dashboard
+                    console.log('Character found:', result.data);
+                    showMessage(`Loading ${result.data.name}...`, 'success');
                     setTimeout(() => {
                         window.location.href = getDashboardUrl(className);
                     }, 500);
                 } else {
-                    // Kein Charakter - gehe zur Charaktererstellung
-                    console.log('Kein Charakter gefunden - Charaktererstellung starten');
-                    showMessage('Starte Charaktererstellung...', 'info');
+                    // No character - go to character creation
+                    console.log('No character found - starting character creation');
+                    showMessage('Starting character creation...', 'info');
                     setTimeout(() => {
                         window.location.href = `character-creation.html?class=${className}`;
                     }, 500);
                 }
             } catch (error) {
-                console.error('Fehler beim Prüfen des Charakters:', error);
-                showMessage('Verbindungsfehler - Starte Charaktererstellung...', 'warning');
-                // Im Fehlerfall direkt zur Charaktererstellung
+                console.error('Error checking character:', error);
+                showMessage('Connection error - Starting character creation...', 'warning');
+                // On error, go to character creation
                 setTimeout(() => {
                     window.location.href = `character-creation.html?class=${className}`;
                 }, 500);
@@ -370,21 +546,15 @@
 
             const msg = document.createElement('div');
             msg.className = `status-message ${type}`;
-            msg.textContent = text;
-            msg.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: ${type === 'success' ? '#4CAF50' : type === 'warning' ? '#FF9800' : '#2196F3'};
-                color: white;
-                padding: 15px 30px;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 10000;
-                font-weight: bold;
-                animation: slideDown 0.3s ease-out;
-            `;
+
+            // Add icon based on type
+            const iconSvg = type === 'success'
+                ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+                : type === 'warning'
+                ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
+                : '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+
+            msg.innerHTML = iconSvg + text;
             document.body.appendChild(msg);
 
             setTimeout(() => msg.remove(), 3000);
@@ -416,26 +586,23 @@
                         if (card) {
                             const badge = document.createElement('div');
                             badge.className = 'class-badge';
-                            badge.textContent = '✓ Charakter vorhanden';
+                            badge.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Character exists';
                             card.querySelector('.class-content').appendChild(badge);
                         }
                     }
                 } catch (error) {
-                    console.error(`Fehler beim Prüfen der Klasse ${className}:`, error);
+                    console.error(`Error checking class ${className}:`, error);
                 }
             }
         }
 
-        // Animation beim Laden
+        // Animate cards on load
         window.addEventListener('load', () => {
             const cards = document.querySelectorAll('.class-card');
             cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(50px)';
                 setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease-out';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
+                    card.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    card.classList.add('visible');
                 }, index * 100);
             });
 

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barden Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
         * {
             margin: 0;
@@ -467,9 +469,46 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #8e24aa;
         }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #f44336; }
+        .notification.warning { background: #ff9800; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
+        <div class="loading-spinner"></div>
+    </div>
+
     <nav class="navbar">
         <h1>🎵 <span id="characterName">Barde</span> - Stufe <span id="characterLevel">1</span></h1>
         <div class="nav-menu">
@@ -660,6 +699,23 @@
         let characterId = 1;
         let currentSpellFilter = 'all';
 
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
         // Skills with ability mapping
         const skills = {
             'acrobatics': { name: 'Akrobatik', ability: 'dex' },
@@ -701,6 +757,7 @@
 
         async function loadCharacter() {
             try {
+                showLoading();
                 const response = await fetch(`${API_URL}?action=character&class=bard`);
                 const result = await response.json();
 
@@ -729,9 +786,14 @@
                     loadSpellSlots(char);
                     loadSpells(char);
                     loadEquipment(char);
+                } else {
+                    throw new Error('Kein Charakter gefunden');
                 }
             } catch (error) {
                 console.error('Fehler beim Laden des Charakters:', error);
+                showNotification(error.message || 'Fehler beim Laden des Charakters', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -977,26 +1039,35 @@
         async function updateCharacterHP(newHP) {
             try {
                 const formData = new FormData();
-                formData.append('action', 'update_hp');
                 formData.append('character_id', characterId);
                 formData.append('current_hp', newHP);
-                await fetch(API_URL, { method: 'POST', body: formData });
+                const response = await fetch(`${API_URL}?action=update_hp`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || 'HP-Update fehlgeschlagen');
+                showNotification('HP gespeichert!');
             } catch (error) {
                 console.error('Fehler beim Speichern der HP:', error);
+                showNotification(error.message || 'Fehler beim Speichern der HP', 'error');
             }
         }
 
         async function shortRest() {
             if (confirm('Kurze Rast nehmen? (1 Stunde)')) {
                 try {
+                    showLoading();
                     const response = await fetch(`${API_URL}?action=short_rest&character_id=${characterId}`);
                     const result = await response.json();
                     if (result.success) {
-                        alert('Kurze Rast abgeschlossen!');
+                        showNotification('Kurze Rast abgeschlossen!');
                         loadCharacter();
+                    } else {
+                        throw new Error(result.error || 'Kurze Rast fehlgeschlagen');
                     }
                 } catch (error) {
                     console.error('Fehler bei kurzer Rast:', error);
+                    showNotification(error.message || 'Fehler bei kurzer Rast', 'error');
+                } finally {
+                    hideLoading();
                 }
             }
         }
@@ -1004,14 +1075,20 @@
         async function longRest() {
             if (confirm('Lange Rast nehmen? (8 Stunden) HP und alle Zauberplätze werden wiederhergestellt.')) {
                 try {
+                    showLoading();
                     const response = await fetch(`${API_URL}?action=long_rest&character_id=${characterId}`);
                     const result = await response.json();
                     if (result.success) {
-                        alert('Lange Rast abgeschlossen!');
+                        showNotification('Lange Rast abgeschlossen!');
                         loadCharacter();
+                    } else {
+                        throw new Error(result.error || 'Lange Rast fehlgeschlagen');
                     }
                 } catch (error) {
                     console.error('Fehler bei langer Rast:', error);
+                    showNotification(error.message || 'Fehler bei langer Rast', 'error');
+                } finally {
+                    hideLoading();
                 }
             }
         }
