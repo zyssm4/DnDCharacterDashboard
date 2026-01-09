@@ -455,42 +455,38 @@
         <div class="wizard-step" id="step2">
             <div class="info-box">
                 <h3>Attributswerte verteilen</h3>
-                <p>Verteile deine Attributspunkte. Du hast 27 Punkte zur Verfügung (Punktekauf-System). Jeder Wert beginnt bei 8.</p>
-            </div>
-
-            <div class="points-remaining">
-                Verbleibende Punkte: <span id="pointsRemaining">27</span>
+                <p>Setze deine Attributswerte. Wähle Werte zwischen 3 und 20.</p>
             </div>
 
             <div class="ability-scores">
                 <div class="ability-score">
                     <label for="str">Stärke (STR)</label>
-                    <input type="number" id="str" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="str" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="strMod">+0</div>
                 </div>
                 <div class="ability-score">
                     <label for="dex">Geschicklichkeit (DEX)</label>
-                    <input type="number" id="dex" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="dex" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="dexMod">+0</div>
                 </div>
                 <div class="ability-score">
                     <label for="con">Konstitution (CON)</label>
-                    <input type="number" id="con" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="con" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="conMod">+0</div>
                 </div>
                 <div class="ability-score">
                     <label for="int">Intelligenz (INT)</label>
-                    <input type="number" id="int" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="int" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="intMod">+0</div>
                 </div>
                 <div class="ability-score">
                     <label for="wis">Weisheit (WIS)</label>
-                    <input type="number" id="wis" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="wis" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="wisMod">+0</div>
                 </div>
                 <div class="ability-score">
                     <label for="cha">Charisma (CHA)</label>
-                    <input type="number" id="cha" class="ability-input" min="8" max="15" value="8">
+                    <input type="number" id="cha" class="ability-input" min="3" max="20" value="10">
                     <div class="ability-modifier" id="chaMod">+0</div>
                 </div>
             </div>
@@ -684,6 +680,127 @@
             'survival': 'Überlebenskunst'
         };
 
+        // Equipment choices by class
+        const equipmentChoices = {
+            'druid': [
+                {
+                    label: 'Waffe wählen:',
+                    options: [
+                        { id: 'weapon_scimitar', name: 'Krummsäbel' },
+                        { id: 'weapon_simple', name: 'Jede einfache Nahkampfwaffe' }
+                    ]
+                },
+                {
+                    label: 'Schild wählen:',
+                    options: [
+                        { id: 'shield_wooden', name: 'Holzschild' },
+                        { id: 'no_shield', name: 'Kein Schild' }
+                    ]
+                },
+                {
+                    label: 'Ausrüstungspaket:',
+                    options: [
+                        { id: 'pack_explorer', name: 'Forscherpaket' },
+                        { id: 'pack_priest', name: 'Priesterpaket' }
+                    ]
+                }
+            ],
+            'rogue': [
+                {
+                    label: 'Waffe wählen:',
+                    options: [
+                        { id: 'weapon_rapier', name: 'Rapier' },
+                        { id: 'weapon_shortsword', name: 'Kurzschwert' }
+                    ]
+                },
+                {
+                    label: 'Fernkampfwaffe:',
+                    options: [
+                        { id: 'weapon_shortbow', name: 'Kurzbogen und Köcher mit 20 Pfeilen' },
+                        { id: 'weapon_shortsword2', name: 'Kurzschwert' }
+                    ]
+                },
+                {
+                    label: 'Ausrüstungspaket:',
+                    options: [
+                        { id: 'pack_burglar', name: 'Einbrecherpaket' },
+                        { id: 'pack_dungeoneer', name: 'Kerkerforscherpaket' },
+                        { id: 'pack_explorer', name: 'Forscherpaket' }
+                    ]
+                }
+            ],
+            'bard': [
+                {
+                    label: 'Waffe wählen:',
+                    options: [
+                        { id: 'weapon_rapier', name: 'Rapier' },
+                        { id: 'weapon_longsword', name: 'Langschwert' },
+                        { id: 'weapon_simple', name: 'Jede einfache Waffe' }
+                    ]
+                },
+                {
+                    label: 'Ausrüstungspaket:',
+                    options: [
+                        { id: 'pack_diplomat', name: 'Diplomatenpaket' },
+                        { id: 'pack_entertainer', name: 'Entertainerspaket' }
+                    ]
+                },
+                {
+                    label: 'Musikinstrument:',
+                    options: [
+                        { id: 'instrument_lute', name: 'Laute' },
+                        { id: 'instrument_other', name: 'Anderes Musikinstrument' }
+                    ]
+                }
+            ],
+            'wizard': [
+                {
+                    label: 'Waffe wählen:',
+                    options: [
+                        { id: 'weapon_quarterstaff', name: 'Kampfstab' },
+                        { id: 'weapon_dagger', name: 'Dolch' }
+                    ]
+                },
+                {
+                    label: 'Arkaner Fokus:',
+                    options: [
+                        { id: 'focus_component', name: 'Komponentenbeutel' },
+                        { id: 'focus_arcane', name: 'Arkaner Fokus' }
+                    ]
+                },
+                {
+                    label: 'Ausrüstungspaket:',
+                    options: [
+                        { id: 'pack_scholar', name: 'Gelehrtenpaket' },
+                        { id: 'pack_explorer', name: 'Forscherpaket' }
+                    ]
+                }
+            ],
+            'paladin': [
+                {
+                    label: 'Waffe und Schild:',
+                    options: [
+                        { id: 'weapon_martial_shield', name: 'Kriegswaffe und Schild' },
+                        { id: 'weapon_martial_two', name: 'Zwei Kriegswaffen' }
+                    ]
+                },
+                {
+                    label: 'Wurfwaffe:',
+                    options: [
+                        { id: 'weapon_javelins', name: '5 Wurfspeere' },
+                        { id: 'weapon_simple_melee', name: 'Jede einfache Nahkampfwaffe' }
+                    ]
+                },
+                {
+                    label: 'Ausrüstungspaket:',
+                    options: [
+                        { id: 'pack_priest', name: 'Priesterpaket' },
+                        { id: 'pack_explorer', name: 'Forscherpaket' }
+                    ]
+                }
+            ]
+        };
+
         // Initialize
         window.addEventListener('load', async () => {
             // Get class from URL
@@ -709,6 +826,7 @@
             // Hide spell step if not a spellcaster
             if (!classData.isSpellcaster) {
                 document.getElementById('step5Progress').style.display = 'none';
+                document.getElementById('step5').style.display = 'none';
                 totalSteps = 5;
             }
 
@@ -720,6 +838,9 @@
 
             // Setup skills
             setupSkills();
+
+            // Setup equipment
+            setupEquipment();
         });
 
         async function loadBackgrounds() {
@@ -751,13 +872,10 @@
         }
 
         function updateAbilityScores() {
-            let totalPoints = 27;
             const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
             abilities.forEach(ability => {
-                const value = parseInt(document.getElementById(ability).value) || 8;
-                const cost = pointBuyCosts[value] || 0;
-                totalPoints -= cost;
+                const value = parseInt(document.getElementById(ability).value) || 10;
 
                 // Update modifier
                 const modifier = Math.floor((value - 10) / 2);
@@ -766,15 +884,6 @@
 
                 characterData.abilities[ability] = value;
             });
-
-            document.getElementById('pointsRemaining').textContent = totalPoints;
-
-            // Disable/enable inputs based on available points
-            if (totalPoints < 0) {
-                document.getElementById('pointsRemaining').style.color = '#ff5252';
-            } else {
-                document.getElementById('pointsRemaining').style.color = 'var(--class-color-1, #66bb6a)';
-            }
         }
 
         function setupSkills() {
@@ -792,7 +901,25 @@
                     <label for="skill_${skill}">${skillNames[skill]}</label>
                 `;
 
-                div.querySelector('input').addEventListener('change', (e) => {
+                const checkbox = div.querySelector('input');
+
+                // Make the entire div clickable
+                div.addEventListener('click', (e) => {
+                    // Prevent double-toggle if checkbox itself was clicked
+                    if (e.target === checkbox) return;
+
+                    const checked = document.querySelectorAll('.skill-checkbox input:checked').length;
+
+                    if (!checkbox.checked && checked >= classData.skillCount) {
+                        alert(`Du kannst maximal ${classData.skillCount} Fertigkeiten wählen!`);
+                        return;
+                    }
+
+                    checkbox.checked = !checkbox.checked;
+                    div.classList.toggle('proficient', checkbox.checked);
+                });
+
+                checkbox.addEventListener('change', (e) => {
                     const checked = document.querySelectorAll('.skill-checkbox input:checked').length;
                     if (checked > classData.skillCount) {
                         e.target.checked = false;
@@ -803,6 +930,34 @@
                 });
 
                 skillGrid.appendChild(div);
+            });
+        }
+
+        function setupEquipment() {
+            const equipmentContainer = document.getElementById('equipmentChoices');
+            const classEquipment = equipmentChoices[selectedClass];
+
+            if (!classEquipment) {
+                equipmentContainer.innerHTML = '<p>Keine Ausrüstungsoptionen für diese Klasse verfügbar.</p>';
+                return;
+            }
+
+            classEquipment.forEach((choice, index) => {
+                const choiceDiv = document.createElement('div');
+                choiceDiv.className = 'equipment-choice';
+
+                let html = `<h4>${choice.label}</h4>`;
+                choice.options.forEach(option => {
+                    html += `
+                        <label style="display: block; margin: 8px 0; cursor: pointer;">
+                            <input type="radio" name="equipment_${index}" value="${option.id}" style="margin-right: 8px;">
+                            ${option.name}
+                        </label>
+                    `;
+                });
+
+                choiceDiv.innerHTML = html;
+                equipmentContainer.appendChild(choiceDiv);
             });
         }
 
@@ -895,6 +1050,12 @@
             // Move to next step
             if (currentStep < totalSteps) {
                 currentStep++;
+
+                // Skip spell step if not a spellcaster
+                if (currentStep === 5 && !classData.isSpellcaster) {
+                    currentStep = 6;
+                }
+
                 showStep(currentStep);
 
                 // Load spells when reaching spell step
@@ -916,6 +1077,12 @@
         function previousStep() {
             if (currentStep > 1) {
                 currentStep--;
+
+                // Skip spell step if not a spellcaster
+                if (currentStep === 5 && !classData.isSpellcaster) {
+                    currentStep = 4;
+                }
+
                 showStep(currentStep);
                 document.getElementById('nextBtn').textContent = 'Weiter';
             }
@@ -960,11 +1127,7 @@
                     return true;
 
                 case 2:
-                    const pointsRemaining = parseInt(document.getElementById('pointsRemaining').textContent);
-                    if (pointsRemaining !== 0) {
-                        alert('Du musst alle 27 Punkte verteilen!');
-                        return false;
-                    }
+                    // No validation needed - free attribute assignment
                     return true;
 
                 case 3:
@@ -972,6 +1135,20 @@
                     if (selectedSkills !== classData.skillCount) {
                         alert(`Du musst genau ${classData.skillCount} Fertigkeiten wählen!`);
                         return false;
+                    }
+                    return true;
+
+                case 4:
+                    // Validate equipment choices
+                    const classEquipment = equipmentChoices[selectedClass];
+                    if (classEquipment) {
+                        for (let i = 0; i < classEquipment.length; i++) {
+                            const selected = document.querySelector(`input[name="equipment_${i}"]:checked`);
+                            if (!selected) {
+                                alert(`Bitte wähle eine Option für: ${classEquipment[i].label}`);
+                                return false;
+                            }
+                        }
                     }
                     return true;
 
@@ -1008,6 +1185,20 @@
                 case 3:
                     characterData.skills = Array.from(document.querySelectorAll('.skill-checkbox input:checked'))
                         .map(cb => cb.value);
+                    break;
+
+                case 4:
+                    // Save equipment choices
+                    const classEquipment = equipmentChoices[selectedClass];
+                    if (classEquipment) {
+                        characterData.equipment = [];
+                        for (let i = 0; i < classEquipment.length; i++) {
+                            const selected = document.querySelector(`input[name="equipment_${i}"]:checked`);
+                            if (selected) {
+                                characterData.equipment.push(selected.value);
+                            }
+                        }
+                    }
                     break;
 
                 case 5:
@@ -1059,14 +1250,24 @@
                 const hitDice = { druid: 8, rogue: 8, bard: 8, wizard: 6, paladin: 10 };
                 const maxHP = hitDice[selectedClass] + conMod;
 
-                // Prepare character data for API
+                // Calculate AC (base 10 + DEX modifier)
+                const dexMod = Math.floor((characterData.abilities.dex - 10) / 2);
+                const baseAC = 10 + dexMod;
+
+                // Prepare character data for API - map class names to German
+                const classNameMap = {
+                    'druid': 'Druide',
+                    'rogue': 'Schurke',
+                    'bard': 'Barde',
+                    'wizard': 'Magier',
+                    'paladin': 'Paladin'
+                };
+
                 const apiData = {
-                    action: 'create_character',
                     name: characterData.name,
-                    class: selectedClass,
+                    class: classNameMap[selectedClass] || selectedClass,
                     race: characterData.race,
                     background: characterData.background,
-                    subclass: characterData.subclass,
                     level: 1,
                     strength: characterData.abilities.str,
                     dexterity: characterData.abilities.dex,
@@ -1074,33 +1275,48 @@
                     intelligence: characterData.abilities.int,
                     wisdom: characterData.abilities.wis,
                     charisma: characterData.abilities.cha,
+                    armor_class: baseAC,
                     max_hp: maxHP,
                     current_hp: maxHP,
-                    proficient_skills: JSON.stringify(characterData.skills),
-                    known_spells: JSON.stringify(characterData.spells)
+                    skill_proficiencies: characterData.skills,
+                    known_spells: characterData.spells || [],
+                    inventory: characterData.equipment || [],
+                    equipped_items: [],
+                    spell_slots: [],
+                    druid_circle: characterData.subclass || null
                 };
 
-                const formData = new FormData();
-                Object.entries(apiData).forEach(([key, value]) => {
-                    formData.append(key, value);
+                console.log('Sending character data:', apiData);
+
+                const response = await fetch(`${API_URL}?action=create_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(apiData)
                 });
 
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    throw new Error(`Server returned ${response.status}: ${errorText}`);
+                }
 
                 const result = await response.json();
+                console.log('Server response:', result);
 
                 if (result.success) {
                     alert('Charakter erfolgreich erstellt!');
                     window.location.href = getDashboardUrl(selectedClass);
                 } else {
+                    console.error('Creation failed:', result.error);
                     alert('Fehler beim Erstellen des Charakters: ' + (result.error || 'Unbekannter Fehler'));
                 }
             } catch (error) {
                 console.error('Fehler:', error);
-                alert('Fehler beim Erstellen des Charakters!');
+                alert('Fehler beim Erstellen des Charakters: ' + error.message);
             }
         }
 

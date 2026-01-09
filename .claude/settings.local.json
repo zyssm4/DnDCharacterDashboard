@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(done)",
+      "Bash(for file in character-rogue.html equipment-rogue.html character-bard.html equipment-bard.html spells-bard.html character-wizard.html equipment-wizard.html spells-wizard.html character-paladin.html equipment-paladin.html spells-paladin.html)",
+      "Bash(do)"
+    ]
+  }
+}

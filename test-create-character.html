@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Character Creation API</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #66bb6a;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #a5d6a7;
+            margin-bottom: 15px;
+        }
+
+        button {
+            background: #66bb6a;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #81c784;
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        .result {
+            margin-top: 15px;
+        }
+
+        .success {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .info {
+            color: #2196f3;
+            font-weight: bold;
+        }
+
+        .select-group {
+            margin: 15px 0;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8e8e8;
+            border: 2px solid #66bb6a;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #a5d6a7;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Character Creation API Test</h1>
+
+    <div class="container">
+        <div class="test-section">
+            <h2>Test-Charakter erstellen</h2>
+
+            <div class="select-group">
+                <label for="testClass">Klasse wählen:</label>
+                <select id="testClass">
+                    <option value="druid">Druide</option>
+                    <option value="rogue">Schurke</option>
+                    <option value="bard">Barde</option>
+                    <option value="wizard">Magier</option>
+                    <option value="paladin">Paladin</option>
+                </select>
+            </div>
+
+            <button onclick="testCreateCharacter()">Charakter erstellen</button>
+            <button onclick="checkCharacters()">Alle Charaktere anzeigen</button>
+            <button onclick="clearResults()">Ergebnisse löschen</button>
+
+            <div class="result" id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+
+        async function testCreateCharacter() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p class="info">Teste Charaktererstellung...</p>';
+
+            const selectedClass = document.getElementById('testClass').value;
+
+            const classNameMap = {
+                'druid': 'Druide',
+                'rogue': 'Schurke',
+                'bard': 'Barde',
+                'wizard': 'Magier',
+                'paladin': 'Paladin'
+            };
+
+            // Test character data
+            const testCharacter = {
+                name: `Test ${classNameMap[selectedClass]} ${Date.now()}`,
+                class: classNameMap[selectedClass],
+                race: 'Mensch',
+                background: 'Soldat',
+                level: 1,
+                strength: 15,
+                dexterity: 14,
+                constitution: 13,
+                intelligence: 12,
+                wisdom: 10,
+                charisma: 8,
+                armor_class: 12,
+                max_hp: 10,
+                current_hp: 10,
+                skill_proficiencies: ['athletics', 'perception'],
+                known_spells: [],
+                inventory: ['weapon_rapier', 'pack_explorer'],
+                equipped_items: [],
+                spell_slots: [],
+                druid_circle: null
+            };
+
+            try {
+                console.log('Sending:', testCharacter);
+
+                const response = await fetch(`${API_URL}?action=create_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testCharacter)
+                });
+
+                console.log('Response status:', response.status);
+
+                const responseText = await response.text();
+                console.log('Response text:', responseText);
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Invalid JSON response: ${responseText}`);
+                }
+
+                console.log('Parsed result:', result);
+
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Charakter erfolgreich erstellt!</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                        <p><strong>Request Data:</strong></p>
+                        <pre>${JSON.stringify(testCharacter, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Fehler beim Erstellen</p>
+                        <p>Error: ${result.error || 'Unbekannter Fehler'}</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                        <p><strong>Request Data:</strong></p>
+                        <pre>${JSON.stringify(testCharacter, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Exception aufgetreten</p>
+                    <p>${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        }
+
+        async function checkCharacters() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p class="info">Lade Charaktere...</p>';
+
+            try {
+                const response = await fetch(`${API_URL}?action=all_characters`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Charaktere geladen (${result.data.length} gefunden)</p>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Fehler beim Laden</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Exception aufgetreten</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        // Add endpoint to db_actions.php for listing all characters
+        console.log(`
+            HINWEIS: Falls "all_characters" nicht existiert, füge dies zu db_actions.php hinzu:
+
+            case 'all_characters':
+                $stmt = $pdo->query("SELECT id, name, class, level, race, background FROM characters ORDER BY id DESC");
+                $characters = $stmt->fetchAll();
+                echo json_encode(['success' => true, 'data' => $characters]);
+                break;
+        `);
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Charaktere Laden</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #66bb6a;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #66bb6a;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #81c784;
+        }
+
+        pre {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result {
+            margin-top: 15px;
+        }
+
+        .success {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .info {
+            color: #2196f3;
+            font-weight: bold;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #a5d6a7;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test: Charaktere aus Datenbank laden</h1>
+
+    <div class="container">
+        <div class="test-section">
+            <h2>1. Alle Charaktere anzeigen</h2>
+            <button onclick="testAllCharacters()">Alle Charaktere laden</button>
+            <div class="result" id="allCharsResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Charaktere nach Klasse laden</h2>
+            <button onclick="testLoadByClass('druid')">Druide laden</button>
+            <button onclick="testLoadByClass('rogue')">Schurke laden</button>
+            <button onclick="testLoadByClass('bard')">Barde laden</button>
+            <button onclick="testLoadByClass('wizard')">Magier laden</button>
+            <button onclick="testLoadByClass('paladin')">Paladin laden</button>
+            <div class="result" id="byClassResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Datenbank-Struktur prüfen</h2>
+            <p class="info">Falls keine Charaktere geladen werden, prüfe:</p>
+            <ul>
+                <li>Existieren Charaktere in der Datenbank?</li>
+                <li>Ist die Spalte 'class' vorhanden?</li>
+                <li>Sind die Klassennamen korrekt (Druide, Schurke, etc.)?</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+
+        async function testAllCharacters() {
+            const resultDiv = document.getElementById('allCharsResult');
+            resultDiv.innerHTML = '<p class="info">Lade alle Charaktere...</p>';
+
+            try {
+                const response = await fetch(`${API_URL}?action=all_characters`);
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Invalid JSON: ${responseText}`);
+                }
+
+                if (result.success) {
+                    if (result.data.length === 0) {
+                        resultDiv.innerHTML = `
+                            <p class="info">✓ API funktioniert, aber KEINE Charaktere gefunden!</p>
+                            <p>Die Datenbank ist leer. Erstelle zuerst einen Charakter mit der Charaktererstellung.</p>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `
+                            <p class="success">✅ ${result.data.length} Charakter(e) gefunden!</p>
+                            <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                        `;
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ API-Fehler</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Fehler beim Laden</p>
+                    <p>${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        }
+
+        async function testLoadByClass(className) {
+            const resultDiv = document.getElementById('byClassResult');
+            resultDiv.innerHTML = `<p class="info">Lade ${className}...</p>`;
+
+            try {
+                const response = await fetch(`${API_URL}?action=character&class=${className}`);
+
+                console.log(`${className} - Response status:`, response.status);
+
+                const responseText = await response.text();
+                console.log(`${className} - Raw response:`, responseText);
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Invalid JSON: ${responseText}`);
+                }
+
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ ${className} Charakter gefunden!</p>
+                        <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                    `;
+                } else if (result.error === 'Character not found') {
+                    resultDiv.innerHTML = `
+                        <p class="info">ℹ️ Kein ${className} Charakter in der Datenbank</p>
+                        <p>Erstelle einen ${className} mit der Charaktererstellung.</p>
+                        <p><strong>API-Antwort:</strong></p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Fehler</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Exception</p>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+
+        // Test connection on load
+        window.addEventListener('load', async () => {
+            console.log('Testing database connection...');
+
+            try {
+                const response = await fetch(API_URL + '?action=all_characters');
+                if (response.ok) {
+                    console.log('✅ Database connection OK');
+                } else {
+                    console.error('❌ Database connection failed:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Cannot reach API:', error);
+            }
+        });
+    </script>
+</body>
+</html>

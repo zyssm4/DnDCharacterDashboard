@@ -336,6 +336,55 @@
             gap: 10px;
         }
 
+        .rest-button-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .rest-tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1000;
+            background: rgba(29, 60, 16, 0.98);
+            color: #e8f5e9;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #4caf50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 280px;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .rest-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #4caf50 transparent transparent transparent;
+        }
+
+        .rest-button-wrapper:hover .rest-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .rest-tooltip strong {
+            color: #c8e6c9;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
         .info-row {
             display: flex;
             justify-content: space-between;
@@ -878,6 +927,136 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Proficiency Modal Styles */
+        .prof-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .prof-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .prof-modal-content {
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
+            border: 2px solid #4caf50;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        .prof-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 2px solid #4caf50;
+        }
+
+        .prof-modal-header h2 {
+            margin: 0;
+            color: #c8e6c9;
+            font-size: 1.5em;
+        }
+
+        .prof-modal-close {
+            color: #a5d6a7;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .prof-modal-close:hover {
+            color: #c8e6c9;
+        }
+
+        .prof-modal-body {
+            padding: 20px;
+        }
+
+        .prof-section {
+            margin-bottom: 25px;
+        }
+
+        .prof-section h3 {
+            color: #a5d6a7;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .proficiency-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .proficiency-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .proficiency-checkbox:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .proficiency-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .proficiency-checkbox span {
+            color: #e8f5e9;
+            font-size: 0.95em;
+        }
+
+        .prof-modal-footer {
+            padding: 15px 20px;
+            border-top: 2px solid #4caf50;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #757575;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -891,6 +1070,7 @@
             <a href="dashboard.html" class="nav-item">Dashboard</a>
             <a href="character.html" class="nav-item">Charakter bearbeiten</a>
             <a href="spells.html" class="nav-item">Zauber verwalten</a>
+            <a href="wildshape.html" class="nav-item">🐺 Wildgestalt</a>
             <a href="equipment.html" class="nav-item">Ausrüstung</a>
         </div>
     </div>
@@ -912,6 +1092,7 @@
                     <div class="info-row">
                         <span>Übungsbonus:</span>
                         <strong id="profBonus">+2</strong>
+                        <button onclick="openProficiencyModal()" style="margin-left: 10px; padding: 4px 8px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em;">⚙️ Bearbeiten</button>
                     </div>
                 </div>
 
@@ -1038,8 +1219,27 @@
                     </div>
 
                     <div class="quick-actions">
-                        <button class="btn" onclick="longRest()">Lange Rast</button>
-                        <button class="btn" onclick="shortRest()">Kurze Rast</button>
+                        <div class="rest-button-wrapper">
+                            <button class="btn" onclick="longRest()">🌙 Lange Rast</button>
+                            <div class="rest-tooltip">
+                                <strong>Lange Rast (8 Stunden)</strong><br>
+                                • Alle Trefferpunkte wiederhergestellt<br>
+                                • Alle Zauberplätze zurück<br>
+                                • Alle Trefferwürfel zurück (bis zu 50% deines Maximums)<br>
+                                • Wildgestalt-Verwendungen zurück<br>
+                                • Die meisten Klassenmerkmale erneuert
+                            </div>
+                        </div>
+                        <div class="rest-button-wrapper">
+                            <button class="btn" onclick="shortRest()">☀️ Kurze Rast</button>
+                            <div class="rest-tooltip">
+                                <strong>Kurze Rast (1 Stunde)</strong><br>
+                                • Trefferwürfel ausgeben für HP-Heilung<br>
+                                • Wildgestalt-Verwendungen zurück<br>
+                                • Bestimmte Klassenmerkmale erneuert<br>
+                                (z.B. Action Surge, Second Wind)
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2204,6 +2404,132 @@
         }
 
         init();
+
+        // Proficiency Management Functions
+        function openProficiencyModal() {
+            const modal = document.getElementById('proficiencyModal');
+
+            // Populate saving throws
+            const savingThrowsHtml = [
+                { name: 'Stärke', key: 'strength' },
+                { name: 'Geschicklichkeit', key: 'dexterity' },
+                { name: 'Konstitution', key: 'constitution' },
+                { name: 'Intelligenz', key: 'intelligence' },
+                { name: 'Weisheit', key: 'wisdom' },
+                { name: 'Charisma', key: 'charisma' }
+            ].map(ability => {
+                const isChecked = savingThrowProficiencies.includes(ability.key);
+                return `
+                    <label class="proficiency-checkbox">
+                        <input type="checkbox" value="${ability.key}"
+                               ${isChecked ? 'checked' : ''}
+                               onchange="toggleSavingThrow('${ability.key}')">
+                        <span>${ability.name}</span>
+                    </label>
+                `;
+            }).join('');
+
+            // Populate skills
+            const skillsHtml = Object.entries(skillAbilities).map(([key, skill]) => {
+                const isChecked = skillProficiencies.includes(key);
+                return `
+                    <label class="proficiency-checkbox">
+                        <input type="checkbox" value="${key}"
+                               ${isChecked ? 'checked' : ''}
+                               onchange="toggleSkill('${key}')">
+                        <span>${skill.name} (${skill.ability.substring(0, 3).toUpperCase()})</span>
+                    </label>
+                `;
+            }).join('');
+
+            document.getElementById('savingThrowsCheckboxes').innerHTML = savingThrowsHtml;
+            document.getElementById('skillsCheckboxes').innerHTML = skillsHtml;
+
+            modal.classList.add('show');
+        }
+
+        function closeProficiencyModal() {
+            document.getElementById('proficiencyModal').classList.remove('show');
+        }
+
+        function toggleSavingThrow(key) {
+            const index = savingThrowProficiencies.indexOf(key);
+            if (index > -1) {
+                savingThrowProficiencies.splice(index, 1);
+            } else {
+                savingThrowProficiencies.push(key);
+            }
+            renderSavingThrows();
+        }
+
+        function toggleSkill(key) {
+            const index = skillProficiencies.indexOf(key);
+            if (index > -1) {
+                skillProficiencies.splice(index, 1);
+            } else {
+                skillProficiencies.push(key);
+            }
+            renderSkills();
+        }
+
+        async function saveProficiencies() {
+            const data = {
+                id: currentCharacterId,
+                name: document.getElementById('characterName').textContent,
+                level: characterStats.level,
+                druid_circle: 'land',
+                strength: characterStats.strength,
+                dexterity: characterStats.dexterity,
+                constitution: characterStats.constitution,
+                intelligence: characterStats.intelligence,
+                wisdom: characterStats.wisdom,
+                charisma: characterStats.charisma,
+                armor_class: characterStats.armorClass,
+                current_hp: characterStats.currentHP,
+                max_hp: characterStats.maxHP,
+                saving_throw_proficiencies: savingThrowProficiencies,
+                skill_proficiencies: skillProficiencies
+            };
+
+            const result = await apiRequest('update_character', 'POST', data);
+            if (result && result.success) {
+                alert('Übungen erfolgreich gespeichert!');
+                closeProficiencyModal();
+            } else {
+                alert('Fehler beim Speichern!');
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('proficiencyModal').addEventListener('click', (e) => {
+            if (e.target.id === 'proficiencyModal') {
+                closeProficiencyModal();
+            }
+        });
     </script>
+
+    <!-- Proficiency Management Modal -->
+    <div id="proficiencyModal" class="prof-modal">
+        <div class="prof-modal-content">
+            <div class="prof-modal-header">
+                <h2>Übungen verwalten</h2>
+                <span class="prof-modal-close" onclick="closeProficiencyModal()">✕</span>
+            </div>
+            <div class="prof-modal-body">
+                <div class="prof-section">
+                    <h3>Rettungswurf-Übungen</h3>
+                    <div id="savingThrowsCheckboxes" class="proficiency-list"></div>
+                </div>
+                <div class="prof-section">
+                    <h3>Fertigkeits-Übungen</h3>
+                    <div id="skillsCheckboxes" class="proficiency-list"></div>
+                </div>
+            </div>
+            <div class="prof-modal-footer">
+                <button class="btn" onclick="saveProficiencies()">💾 Speichern</button>
+                <button class="btn btn-secondary" onclick="closeProficiencyModal()">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

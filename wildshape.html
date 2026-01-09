@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgestalt - Druiden Tracker</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
+            color: #e8f5e9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #a5d6a7;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: rgba(165, 214, 167, 0.2);
+            color: #c8e6c9;
+        }
+
+        nav a.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #c8e6c9;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #a5d6a7;
+            font-size: 1.1em;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #4caf50;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 8px;
+            color: #a5d6a7;
+            font-weight: bold;
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #4caf50;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e8f5e9;
+            font-size: 1em;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #66bb6a;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .badge:hover {
+            background: rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .badge.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        /* Beast Grid */
+        .beast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .beast-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #4caf50;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .beast-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+            border-color: #66bb6a;
+        }
+
+        .beast-card.favorite {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .beast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .beast-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #c8e6c9;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .favorite-btn:hover, .favorite-btn.active {
+            color: #ffd700;
+            transform: scale(1.2);
+        }
+
+        .beast-meta {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .meta-tag {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .cr-tag {
+            background: rgba(255, 152, 0, 0.3);
+            border: 1px solid #ff9800;
+            color: #ffb74d;
+        }
+
+        .level-tag {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+            color: #a5d6a7;
+        }
+
+        .swim-tag {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid #2196f3;
+            color: #64b5f6;
+        }
+
+        .fly-tag {
+            background: rgba(156, 39, 176, 0.3);
+            border: 1px solid #9c27b0;
+            color: #ba68c8;
+        }
+
+        .beast-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #a5d6a7;
+            margin-bottom: 4px;
+        }
+
+        /* Tooltips */
+        .tooltip-trigger {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #a5d6a7;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1000;
+            background: rgba(29, 60, 16, 0.98);
+            color: #e8f5e9;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4caf50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 280px;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #4caf50 transparent transparent transparent;
+        }
+
+        .tooltip-trigger:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tooltip-section {
+            margin-bottom: 8px;
+        }
+
+        .tooltip-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-value {
+            color: #c8e6c9;
+            font-size: 0.95em;
+        }
+
+        .stat-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #c8e6c9;
+        }
+
+        .beast-abilities {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .abilities-title {
+            font-weight: bold;
+            color: #a5d6a7;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .ability-list {
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #c8e6c9;
+        }
+
+        .beast-attacks {
+            margin-top: 10px;
+        }
+
+        .attack-item {
+            background: rgba(244, 67, 54, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            border-left: 3px solid #f44336;
+        }
+
+        .attack-name {
+            font-weight: bold;
+            color: #ff8a80;
+            font-size: 0.9em;
+        }
+
+        .attack-details {
+            font-size: 0.85em;
+            color: #ffcdd2;
+            margin-top: 4px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a5d6a7;
+            font-size: 1.2em;
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .summary-item {
+            flex: 1;
+        }
+
+        .summary-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .summary-label {
+            font-size: 0.9em;
+            color: #a5d6a7;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 3px solid #4caf50;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .modal-close:hover {
+            background: #d32f2f;
+        }
+
+        @media (max-width: 768px) {
+            .beast-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-summary {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="character.html">👤 Charakter</a>
+        <a href="spells.html">✨ Zauber</a>
+        <a href="equipment.html">⚔️ Ausrüstung</a>
+        <a href="wildshape.html" class="active">🐺 Wildgestalt</a>
+    </nav>
+
+    <div class="container">
+        <h1>🐺 Wildgestalt - Tierformen</h1>
+        <p class="subtitle">Wähle deine Tiergestalten basierend auf deinem Druiden-Level</p>
+
+        <!-- Stats Summary -->
+        <div class="stats-summary">
+            <div class="summary-item">
+                <div class="summary-value" id="totalBeasts">0</div>
+                <div class="summary-label">Verfügbare Formen</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="favoriteCount">0</div>
+                <div class="summary-label">Favoriten</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-value" id="druidLevel">2</div>
+                <div class="summary-label">Dein Level</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h2 style="color: #a5d6a7; margin-bottom: 15px;">🔍 Filter</h2>
+
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="levelFilter">Dein Druiden-Level:</label>
+                    <input type="number" id="levelFilter" min="2" max="20" value="2">
+                </div>
+
+                <div class="filter-group">
+                    <label for="crFilter">Challenge Rating (CR):</label>
+                    <select id="crFilter">
+                        <option value="all">Alle CR</option>
+                        <option value="0">CR 0</option>
+                        <option value="0.125">CR 1/8</option>
+                        <option value="0.25">CR 1/4</option>
+                        <option value="0.5">CR 1/2</option>
+                        <option value="1">CR 1</option>
+                        <option value="2">CR 2</option>
+                        <option value="3">CR 3+</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Fähigkeiten:</label>
+                    <div class="filter-badges">
+                        <div class="badge" data-filter="swim">🌊 Schwimmen</div>
+                        <div class="badge" data-filter="fly">🦅 Fliegen</div>
+                        <div class="badge" data-filter="favorites">⭐ Favoriten</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Beast Grid -->
+        <div class="beast-grid" id="beastGrid">
+            <!-- Beast cards will be inserted here -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            Keine Tierformen für die ausgewählten Filter gefunden.
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal" id="beastModal">
+        <div class="modal-content" id="modalContent">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <!-- Details will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+        const CHARACTER_ID = new URLSearchParams(window.location.search).get('id') || 1;
+
+        let allBeasts = [];
+        let favorites = JSON.parse(localStorage.getItem('wildshape_favorites') || '[]');
+        let currentFilters = {
+            level: 2,
+            cr: 'all',
+            swim: false,
+            fly: false,
+            favoritesOnly: false
+        };
+
+        // Transformation state
+        let characterData = null;
+        let originalStats = JSON.parse(localStorage.getItem('wildshape_original_stats') || 'null');
+        let currentTransformation = JSON.parse(localStorage.getItem('wildshape_current_form') || 'null');
+
+        // Load character and beasts on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCharacter();
+            await loadBeasts();
+            setupFilterListeners();
+        });
+
+        async function loadCharacter() {
+            try {
+                const response = await fetch(`${API_URL}?action=character&class=druid`);
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    characterData = result.data;
+                    const level = result.data.level || 2;
+                    document.getElementById('levelFilter').value = level;
+                    document.getElementById('druidLevel').textContent = level;
+                    currentFilters.level = level;
+
+                    // Show transformation status if transformed
+                    updateTransformationStatus();
+                }
+            } catch (error) {
+                console.error('Error loading character:', error);
+            }
+        }
+
+        async function loadBeasts() {
+            try {
+                const response = await fetch(`${API_URL}?action=beast_shapes`);
+                const result = await response.json();
+
+                if (result.success) {
+                    allBeasts = result.data;
+                    filterAndDisplayBeasts();
+                } else {
+                    console.error('Failed to load beasts:', result.error);
+                }
+            } catch (error) {
+                console.error('Error loading beasts:', error);
+            }
+        }
+
+        function setupFilterListeners() {
+            document.getElementById('levelFilter').addEventListener('change', (e) => {
+                currentFilters.level = parseInt(e.target.value);
+                document.getElementById('druidLevel').textContent = currentFilters.level;
+                filterAndDisplayBeasts();
+            });
+
+            document.getElementById('crFilter').addEventListener('change', (e) => {
+                currentFilters.cr = e.target.value;
+                filterAndDisplayBeasts();
+            });
+
+            document.querySelectorAll('.badge[data-filter]').forEach(badge => {
+                badge.addEventListener('click', () => {
+                    badge.classList.toggle('active');
+                    const filter = badge.dataset.filter;
+
+                    if (filter === 'swim') currentFilters.swim = !currentFilters.swim;
+                    if (filter === 'fly') currentFilters.fly = !currentFilters.fly;
+                    if (filter === 'favorites') currentFilters.favoritesOnly = !currentFilters.favoritesOnly;
+
+                    filterAndDisplayBeasts();
+                });
+            });
+        }
+
+        function filterAndDisplayBeasts() {
+            let filtered = allBeasts.filter(beast => {
+                // Level filter
+                if (beast.min_level > currentFilters.level) return false;
+
+                // CR filter (for Moon Druids)
+                if (currentFilters.cr !== 'all') {
+                    const cr = parseFloat(currentFilters.cr);
+                    if (parseFloat(beast.cr) !== cr) return false;
+                }
+
+                // Ability filters
+                if (currentFilters.swim && !beast.requires_swimming) return false;
+                if (currentFilters.fly && !beast.requires_flying) return false;
+
+                // Favorites filter
+                if (currentFilters.favoritesOnly && !favorites.includes(beast.id)) return false;
+
+                return true;
+            });
+
+            displayBeasts(filtered);
+        }
+
+        function displayBeasts(beasts) {
+            const grid = document.getElementById('beastGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (beasts.length === 0) {
+                grid.style.display = 'none';
+                noResults.style.display = 'block';
+                document.getElementById('totalBeasts').textContent = '0';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            grid.innerHTML = beasts.map(beast => createBeastCard(beast)).join('');
+
+            // Update stats
+            document.getElementById('totalBeasts').textContent = beasts.length;
+            document.getElementById('favoriteCount').textContent = favorites.length;
+
+            // Add click listeners
+            document.querySelectorAll('.beast-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('favorite-btn')) {
+                        showBeastDetails(parseInt(card.dataset.beastId));
+                    }
+                });
+            });
+
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(parseInt(btn.dataset.beastId));
+                });
+            });
+        }
+
+        function createBeastCard(beast) {
+            const isFavorite = favorites.includes(beast.id);
+            const attacks = JSON.parse(beast.attacks || '[]');
+
+            return `
+                <div class="beast-card ${isFavorite ? 'favorite' : ''}" data-beast-id="${beast.id}">
+                    <div class="beast-header">
+                        <div class="beast-name">${beast.name_de}</div>
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" data-beast-id="${beast.id}">
+                            ${isFavorite ? '⭐' : '☆'}
+                        </button>
+                    </div>
+
+                    <div class="beast-meta">
+                        <span class="meta-tag cr-tag">CR ${formatCR(beast.cr)}</span>
+                        <span class="meta-tag level-tag">Level ${beast.min_level}+</span>
+                        ${beast.requires_swimming ? '<span class="meta-tag swim-tag">🌊 Schwimmen</span>' : ''}
+                        ${beast.requires_flying ? '<span class="meta-tag fly-tag">🦅 Fliegen</span>' : ''}
+                    </div>
+
+                    <div class="beast-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">HP</div>
+                            <div class="stat-value">${beast.hp}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">AC</div>
+                            <div class="stat-value">${beast.ac}</div>
+                        </div>
+                        <div class="stat-item tooltip-trigger">
+                            <div class="stat-label">Geschw.</div>
+                            <div class="stat-value">${beast.speed.split(',')[0]}</div>
+                            <div class="tooltip">
+                                <div class="tooltip-section">
+                                    <div class="tooltip-label">🏃 Bewegung:</div>
+                                    <div class="tooltip-value">${beast.speed}</div>
+                                </div>
+                                ${beast.senses ? `
+                                <div class="tooltip-section">
+                                    <div class="tooltip-label">👁️ Sinne:</div>
+                                    <div class="tooltip-value">${beast.senses}</div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="beast-stats tooltip-trigger" style="grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px;">
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">STR</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.strength}</div>
+                        </div>
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">DEX</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.dexterity}</div>
+                        </div>
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">CON</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.constitution}</div>
+                        </div>
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">INT</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.intelligence}</div>
+                        </div>
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">WIS</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.wisdom}</div>
+                        </div>
+                        <div class="stat-item" style="padding: 5px;">
+                            <div class="stat-label" style="font-size: 0.65em;">CHA</div>
+                            <div class="stat-value" style="font-size: 0.9em;">${beast.charisma}</div>
+                        </div>
+                        <div class="tooltip">
+                            <div class="tooltip-section">
+                                <div class="tooltip-label">💪 Attribute Modifikatoren:</div>
+                                <div class="tooltip-value">
+                                    STR: ${Math.floor((beast.strength - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.strength - 10) / 2)} |
+                                    DEX: ${Math.floor((beast.dexterity - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.dexterity - 10) / 2)} |
+                                    CON: ${Math.floor((beast.constitution - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.constitution - 10) / 2)}<br>
+                                    INT: ${Math.floor((beast.intelligence - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.intelligence - 10) / 2)} |
+                                    WIS: ${Math.floor((beast.wisdom - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.wisdom - 10) / 2)} |
+                                    CHA: ${Math.floor((beast.charisma - 10) / 2) >= 0 ? '+' : ''}${Math.floor((beast.charisma - 10) / 2)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${beast.special_abilities ? `
+                        <div class="beast-abilities">
+                            <div class="abilities-title">🌟 Besondere Fähigkeiten:</div>
+                            <div class="ability-list">${beast.special_abilities}</div>
+                        </div>
+                    ` : ''}
+
+                    ${attacks.length > 0 ? `
+                        <div class="beast-attacks">
+                            ${attacks.slice(0, 2).map(attack => `
+                                <div class="attack-item">
+                                    <div class="attack-name">⚔️ ${attack.name}</div>
+                                    <div class="attack-details">+${attack.bonus} Angriff • ${attack.damage}</div>
+                                </div>
+                            `).join('')}
+                            ${attacks.length > 2 ? `<small style="color: #a5d6a7;">+${attacks.length - 2} weitere...</small>` : ''}
+                        </div>
+                    ` : ''}
+
+                    <div class="beast-actions" style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button onclick="transformIntoBeast(${beast.id})"
+                                style="flex: 1; padding: 10px; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: all 0.3s;"
+                                onmouseover="this.style.background='#45a049'"
+                                onmouseout="this.style.background='#4caf50'">
+                            🐺 Verwandeln
+                        </button>
+                        <button onclick="showBeastDetails(${beast.id})"
+                                style="flex: 1; padding: 10px; background: rgba(76, 175, 80, 0.2); color: #a5d6a7; border: 2px solid #4caf50; border-radius: 5px; font-weight: bold; cursor: pointer; transition: all 0.3s;"
+                                onmouseover="this.style.background='rgba(76, 175, 80, 0.3)'"
+                                onmouseout="this.style.background='rgba(76, 175, 80, 0.2)'">
+                            📖 Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatCR(cr) {
+            if (cr == 0) return '0';
+            if (cr == 0.125) return '1/8';
+            if (cr == 0.25) return '1/4';
+            if (cr == 0.5) return '1/2';
+            return cr;
+        }
+
+        function toggleFavorite(beastId) {
+            const index = favorites.indexOf(beastId);
+
+            if (index === -1) {
+                favorites.push(beastId);
+            } else {
+                favorites.splice(index, 1);
+            }
+
+            localStorage.setItem('wildshape_favorites', JSON.stringify(favorites));
+            document.getElementById('favoriteCount').textContent = favorites.length;
+            filterAndDisplayBeasts();
+        }
+
+        function showBeastDetails(beastId) {
+            const beast = allBeasts.find(b => b.id === beastId);
+            if (!beast) return;
+
+            const attacks = JSON.parse(beast.attacks || '[]');
+            const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+
+            const modalContent = `
+                <h2 style="color: #c8e6c9; margin-bottom: 20px;">${beast.name_de}</h2>
+
+                <div class="beast-meta" style="margin-bottom: 20px;">
+                    <span class="meta-tag cr-tag">CR ${formatCR(beast.cr)}</span>
+                    <span class="meta-tag level-tag">Ab Level ${beast.min_level}</span>
+                    ${beast.requires_swimming ? '<span class="meta-tag swim-tag">🌊 Schwimmen erforderlich</span>' : ''}
+                    ${beast.requires_flying ? '<span class="meta-tag fly-tag">🦅 Fliegen erforderlich</span>' : ''}
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p><strong style="color: #a5d6a7;">Trefferpunkte:</strong> ${beast.hp}</p>
+                    <p><strong style="color: #a5d6a7;">Rüstungsklasse:</strong> ${beast.ac}</p>
+                    <p><strong style="color: #a5d6a7;">Geschwindigkeit:</strong> ${beast.speed}</p>
+                    ${beast.senses ? `<p><strong style="color: #a5d6a7;">👁️ Sinne:</strong> ${beast.senses}</p>` : ''}
+                </div>
+
+                <h3 style="color: #a5d6a7; margin: 20px 0 10px;">Attributswerte</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+                    ${abilities.map(ability => {
+                        const value = beast[ability];
+                        const modifier = Math.floor((value - 10) / 2);
+                        return `
+                            <div style="background: rgba(76,175,80,0.2); padding: 10px; border-radius: 5px; text-align: center;">
+                                <div style="font-size: 0.8em; color: #a5d6a7;">${ability.substring(0, 3).toUpperCase()}</div>
+                                <div style="font-size: 1.2em; font-weight: bold;">${value}</div>
+                                <div style="font-size: 0.9em; color: #81c784;">(${modifier >= 0 ? '+' : ''}${modifier})</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                ${beast.special_abilities ? `
+                    <h3 style="color: #a5d6a7; margin: 20px 0 10px;">🌟 Besondere Fähigkeiten</h3>
+                    <div style="background: rgba(76,175,80,0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        ${beast.special_abilities}
+                    </div>
+                ` : ''}
+
+                ${attacks.length > 0 ? `
+                    <h3 style="color: #a5d6a7; margin: 20px 0 10px;">⚔️ Angriffe</h3>
+                    ${attacks.map(attack => `
+                        <div class="attack-item" style="margin-bottom: 10px;">
+                            <div class="attack-name">${attack.name}</div>
+                            <div class="attack-details">Angriffsbonus: +${attack.bonus} • Schaden: ${attack.damage}</div>
+                        </div>
+                    `).join('')}
+                ` : ''}
+            `;
+
+            document.getElementById('modalContent').innerHTML = modalContent + '<button class="modal-close" onclick="closeModal()">✕ Schließen</button>';
+            document.getElementById('beastModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('beastModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.getElementById('beastModal').addEventListener('click', (e) => {
+            if (e.target.id === 'beastModal') {
+                closeModal();
+            }
+        });
+
+        // Transformation functions
+        async function transformIntoBeast(beastId) {
+            if (!characterData) {
+                alert('Charakterdaten konnten nicht geladen werden!');
+                return;
+            }
+
+            const beast = allBeasts.find(b => b.id == beastId);
+            if (!beast) {
+                alert('Tier nicht gefunden!');
+                return;
+            }
+
+            // Save original stats if not already transformed
+            if (!originalStats) {
+                originalStats = {
+                    hp: characterData.current_hp,
+                    max_hp: characterData.max_hp,
+                    ac: characterData.armor_class
+                };
+                localStorage.setItem('wildshape_original_stats', JSON.stringify(originalStats));
+            }
+
+            // Save current transformation
+            currentTransformation = {
+                beast_id: beast.id,
+                beast_name: beast.name_de,
+                beast_hp: parseInt(beast.hp),
+                beast_ac: parseInt(beast.ac)
+            };
+            localStorage.setItem('wildshape_current_form', JSON.stringify(currentTransformation));
+
+            // Update character stats in database
+            try {
+                const response = await fetch(`${API_URL}?action=update_hp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char_id: CHARACTER_ID,
+                        current_hp: currentTransformation.beast_hp,
+                        max_hp: currentTransformation.beast_hp
+                    })
+                });
+
+                const hpResult = await response.json();
+
+                // Update AC
+                const acResponse = await fetch(`${API_URL}?action=update_character_ac`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char_id: CHARACTER_ID,
+                        armor_class: currentTransformation.beast_ac
+                    })
+                });
+
+                const acResult = await acResponse.json();
+
+                if (hpResult.success && acResult.success) {
+                    alert(`Verwandlung erfolgreich! Du bist jetzt ein ${beast.name_de}!\n\nHP: ${currentTransformation.beast_hp}\nAC: ${currentTransformation.beast_ac}`);
+                    updateTransformationStatus();
+                } else {
+                    throw new Error('Fehler beim Aktualisieren der Charakterwerte');
+                }
+            } catch (error) {
+                console.error('Transform error:', error);
+                alert('Fehler bei der Verwandlung: ' + error.message);
+            }
+        }
+
+        async function revertToHumanForm() {
+            if (!originalStats) {
+                alert('Keine gespeicherten Original-Werte gefunden!');
+                return;
+            }
+
+            try {
+                // Restore HP
+                const response = await fetch(`${API_URL}?action=update_hp`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char_id: CHARACTER_ID,
+                        current_hp: originalStats.hp,
+                        max_hp: originalStats.max_hp
+                    })
+                });
+
+                const hpResult = await response.json();
+
+                // Restore AC
+                const acResponse = await fetch(`${API_URL}?action=update_character_ac`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char_id: CHARACTER_ID,
+                        armor_class: originalStats.ac
+                    })
+                });
+
+                const acResult = await acResponse.json();
+
+                if (hpResult.success && acResult.success) {
+                    const savedHP = originalStats.hp;
+                    const savedMaxHP = originalStats.max_hp;
+                    const savedAC = originalStats.ac;
+
+                    // Clear transformation state
+                    localStorage.removeItem('wildshape_original_stats');
+                    localStorage.removeItem('wildshape_current_form');
+                    originalStats = null;
+                    currentTransformation = null;
+
+                    alert(`Zurückverwandlung erfolgreich!\n\nHP: ${savedHP}/${savedMaxHP}\nAC: ${savedAC}`);
+                    updateTransformationStatus();
+                } else {
+                    throw new Error('Fehler beim Wiederherstellen der Charakterwerte');
+                }
+            } catch (error) {
+                console.error('Revert error:', error);
+                alert('Fehler bei der Zurückverwandlung: ' + error.message);
+            }
+        }
+
+        function updateTransformationStatus() {
+            const statusContainer = document.querySelector('.filters');
+            let statusHTML = '';
+
+            if (currentTransformation) {
+                statusHTML = `
+                    <div class="transformation-status" style="background: rgba(255, 152, 0, 0.2); border: 2px solid #ff9800; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: bold; color: #ffa726; margin-bottom: 5px;">
+                                    🐺 Aktuelle Form: ${currentTransformation.beast_name}
+                                </div>
+                                <div style="color: #ffb74d; font-size: 14px;">
+                                    HP: ${currentTransformation.beast_hp} • AC: ${currentTransformation.beast_ac}
+                                </div>
+                            </div>
+                            <button onclick="revertToHumanForm()" style="padding: 10px 20px; background: #4caf50; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                                Zurückverwandeln
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const existingStatus = statusContainer.querySelector('.transformation-status');
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+
+            if (statusHTML) {
+                statusContainer.insertAdjacentHTML('afterbegin', statusHTML);
+            }
+        }
+    </script>
+</body>
+</html>

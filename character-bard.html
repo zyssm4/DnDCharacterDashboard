@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charakter bearbeiten - Druiden Tracker</title>
+    <title>Charakter bearbeiten - Barden Tracker</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
     <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
@@ -15,8 +15,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
-            color: #e8f5e9;
+            background: linear-gradient(135deg, #ab47bc 0%, #7b1fa2 100%);
+            color: #f3e5f5;
             min-height: 100vh;
             padding: 20px;
         }
@@ -33,7 +33,7 @@
         }
 
         nav a {
-            color: #a5d6a7;
+            color: #ce93d8;
             text-decoration: none;
             padding: 8px 16px;
             border-radius: 5px;
@@ -42,11 +42,11 @@
 
         nav a:hover {
             background: rgba(165, 214, 167, 0.2);
-            color: #c8e6c9;
+            color: #e1bee7;
         }
 
         nav a.active {
-            background: #4caf50;
+            background: #ab47bc;
             color: white;
         }
 
@@ -58,7 +58,7 @@
         h1 {
             text-align: center;
             margin-bottom: 30px;
-            color: #c8e6c9;
+            color: #e1bee7;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
@@ -71,10 +71,10 @@
         }
 
         .section h2 {
-            color: #a5d6a7;
+            color: #ce93d8;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #4caf50;
+            border-bottom: 2px solid #ab47bc;
         }
 
         .form-group {
@@ -84,7 +84,7 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #c8e6c9;
+            color: #e1bee7;
             font-weight: 600;
         }
 
@@ -92,15 +92,15 @@
             width: 100%;
             padding: 10px;
             border-radius: 5px;
-            border: 2px solid #4caf50;
+            border: 2px solid #ab47bc;
             background: rgba(255, 255, 255, 0.1);
-            color: #e8f5e9;
+            color: #f3e5f5;
             font-size: 16px;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #66bb6a;
+            border-color: #ba68c8;
             background: rgba(255, 255, 255, 0.15);
         }
 
@@ -108,15 +108,15 @@
             width: 100%;
             padding: 10px;
             border-radius: 5px;
-            border: 2px solid #4caf50;
+            border: 2px solid #ab47bc;
             background: rgba(255, 255, 255, 0.1);
-            color: #e8f5e9;
+            color: #f3e5f5;
             font-size: 16px;
         }
 
         select:focus {
             outline: none;
-            border-color: #66bb6a;
+            border-color: #ba68c8;
         }
 
         /* Stat controls */
@@ -133,20 +133,20 @@
         .stat-label {
             flex: 1;
             font-weight: 600;
-            color: #c8e6c9;
+            color: #e1bee7;
         }
 
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            color: #4caf50;
+            color: #ab47bc;
             min-width: 60px;
             text-align: center;
         }
 
         .stat-modifier {
             font-size: 18px;
-            color: #81c784;
+            color: #ce93d8;
             min-width: 50px;
             text-align: center;
         }
@@ -177,17 +177,17 @@
         }
 
         .btn-plus {
-            background: #81c784;
+            background: #ce93d8;
             color: white;
         }
 
         .btn-plus:hover {
-            background: #66bb6a;
+            background: #ba68c8;
             transform: scale(1.05);
         }
 
         .btn-primary {
-            background: #4caf50;
+            background: #ab47bc;
             color: white;
             padding: 12px 24px;
             width: 100%;
@@ -282,7 +282,7 @@
 
         .save-indicator.success {
             background: rgba(76, 175, 80, 0.3);
-            color: #c8e6c9;
+            color: #e1bee7;
             display: block;
         }
 
@@ -323,139 +323,6 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-
-        /* Level-Up Modal */
-        .level-up-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .level-up-modal.show {
-            display: flex;
-        }
-
-        .level-up-content {
-            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
-            border: 3px solid #4caf50;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .level-up-header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #4caf50;
-        }
-
-        .level-up-header h2 {
-            color: #c8e6c9;
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .level-up-subtitle {
-            color: #a5d6a7;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .level-up-body {
-            color: #e8f5e9;
-            line-height: 1.6;
-        }
-
-        .level-up-section {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 4px solid #4caf50;
-        }
-
-        .level-up-section h3 {
-            color: #a5d6a7;
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
-
-        .level-up-feature {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(76, 175, 80, 0.1);
-            border-radius: 5px;
-        }
-
-        .level-up-feature-name {
-            font-weight: bold;
-            color: #c8e6c9;
-            margin-bottom: 5px;
-        }
-
-        .level-up-feature-desc {
-            color: #a5d6a7;
-            font-size: 14px;
-        }
-
-        .level-up-footer {
-            margin-top: 25px;
-            text-align: center;
-            padding-top: 20px;
-            border-top: 2px solid #4caf50;
-        }
-
-        .spell-slots-table {
-            width: 100%;
-            margin: 10px 0;
-            border-collapse: collapse;
-        }
-
-        .spell-slots-table th,
-        .spell-slots-table td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #4caf50;
-        }
-
-        .spell-slots-table th {
-            background: rgba(76, 175, 80, 0.3);
-            color: #c8e6c9;
-            font-weight: bold;
-        }
-
-        .spell-slots-table td {
-            background: rgba(0, 0, 0, 0.2);
-            color: #a5d6a7;
-        }
-
-        .ability-improvement {
-            background: rgba(255, 215, 0, 0.2);
-            border-left-color: #ffd700;
-        }
     </style>
 </head>
 <body>
@@ -465,10 +332,10 @@
     </div>
 
     <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="character.html" class="active">Charakter</a>
-        <a href="spells.html">Zauber</a>
-        <a href="equipment.html">Ausrüstung</a>
+        <a href="dashboard-bard.html">Dashboard</a>
+        <a href="character-bard.html" class="active">Charakter</a>
+        <a href="spells-bard.html">Zauber</a>
+        <a href="equipment-bard.html">Ausrüstung</a>
     </nav>
 
     <div class="container">
@@ -480,7 +347,7 @@
 
             <div class="form-group">
                 <label for="charName">Charaktername</label>
-                <input type="text" id="charName" placeholder="Name des Druiden">
+                <input type="text" id="charName" placeholder="Name des Barden">
             </div>
 
             <div class="stat-control">
@@ -493,15 +360,15 @@
             </div>
 
             <div class="form-group">
-                <label for="druidCircle">Druiden-Zirkel</label>
-                <select id="druidCircle">
-                    <option value="land">Zirkel des Landes</option>
-                    <option value="moon">Zirkel des Mondes</option>
-                    <option value="dreams">Zirkel der Träume</option>
-                    <option value="shepherd">Zirkel des Hirten</option>
-                    <option value="spores">Zirkel der Sporen</option>
-                    <option value="wildfire">Zirkel des Wildfeuers</option>
-                    <option value="stars">Zirkel der Sterne</option>
+                <label for="bardCollege">Bardenkollegium</label>
+                <select id="bardCollege">
+                    <option value="lore">Kollegium der Gelehrsamkeit</option>
+                    <option value="valor">Kollegium der Tapferkeit</option>
+                    <option value="glamour">Kollegium des Glanzes</option>
+                    <option value="swords">Kollegium der Klingen</option>
+                    <option value="whispers">Kollegium der Flüsterer</option>
+                    <option value="eloquence">Kollegium der Eloquenz</option>
+                    
                 </select>
             </div>
         </div>
@@ -608,22 +475,6 @@
         </div>
     </div>
 
-    <!-- Level-Up Guide Modal -->
-    <div id="levelUpModal" class="level-up-modal">
-        <div class="level-up-content">
-            <div class="level-up-header">
-                <h2>🎉 Level Up!</h2>
-                <span class="level-up-subtitle" id="levelUpSubtitle"></span>
-            </div>
-            <div class="level-up-body" id="levelUpBody">
-                <!-- Content wird dynamisch eingefügt -->
-            </div>
-            <div class="level-up-footer">
-                <button class="btn btn-primary" onclick="closeLevelUpModal()">Verstanden!</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         const API_URL = 'db_actions.php';
         const CHARACTER_ID = new URLSearchParams(window.location.search).get('id') || 1;
@@ -659,7 +510,7 @@
         };
 
         let characterName = '';
-        let druidCircle = 'land';
+        let bardCollege = 'lore';
 
         // Load character data on page load
         window.addEventListener('DOMContentLoaded', loadCharacter);
@@ -688,21 +539,19 @@
                     };
 
                     characterName = char.name;
-                    druidCircle = char.druid_circle || 'land'; // Default to 'land' if null/undefined
+                    bardCollege = char.bard_college || 'lore'; // Default to first valid option
 
                     // Update UI
                     document.getElementById('charName').value = characterName;
 
-                    // Set druid circle - use requestAnimationFrame to ensure DOM is ready
-                    requestAnimationFrame(() => {
-                        const circleSelect = document.getElementById('druidCircle');
-                        if (circleSelect) {
-                            circleSelect.value = druidCircle;
-                            console.log('Druid circle set to:', druidCircle);
-                        } else {
-                            console.warn('Druid circle select element not found');
+                    // Use setTimeout to ensure DOM is ready for select element
+                    setTimeout(() => {
+                        const collegeSelect = document.getElementById('bardCollege');
+                        if (collegeSelect && bardCollege) {
+                            collegeSelect.value = bardCollege;
+                            console.log('Bard college set to:', bardCollege);
                         }
-                    });
+                    }, 0);
 
                     updateAllStats();
                 } else {
@@ -717,15 +566,7 @@
         }
 
         function changeLevel(delta) {
-            const oldLevel = characterStats.level;
-            const newLevel = Math.max(1, Math.min(20, characterStats.level + delta));
-
-            // Show level-up guide if leveling up
-            if (newLevel > oldLevel) {
-                showLevelUpGuide(oldLevel, newLevel);
-            }
-
-            characterStats.level = newLevel;
+            characterStats.level = Math.max(1, Math.min(20, characterStats.level + delta));
             updateAllStats();
         }
 
@@ -771,14 +612,14 @@
             try {
                 showLoading();
                 // Get current form values
-                characterName = document.getElementById('charName').value || 'Unbenannter Druide';
-                druidCircle = document.getElementById('druidCircle').value;
+                characterName = document.getElementById('charName').value || 'Unbenannter Barde';
+                bardCollege = document.getElementById('bardCollege').value;
 
                 const updateData = {
                     id: CHARACTER_ID,
                     name: characterName,
                     level: characterStats.level,
-                    druid_circle: druidCircle,
+                    bard_college: bardCollege,
                     strength: characterStats.strength,
                     dexterity: characterStats.dexterity,
                     constitution: characterStats.constitution,
@@ -824,7 +665,7 @@
         }
 
         function goBack() {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard-bard.html';
         }
 
         // Add event listeners for name and circle changes
@@ -832,226 +673,9 @@
             characterName = document.getElementById('charName').value;
         });
 
-        document.getElementById('druidCircle').addEventListener('change', () => {
-            druidCircle = document.getElementById('druidCircle').value;
+        document.getElementById('bardCollege').addEventListener('change', () => {
+            bardCollege = document.getElementById('bardCollege').value;
         });
-
-        // Level-Up Guide Functions
-        const druidLevelUpData = {
-            2: {
-                features: [
-                    { name: 'Wildgestalt', desc: 'Du kannst dich 2x pro kurzer oder langer Rast in Tierformen verwandeln. Max CR: 1/4, keine Schwimm- oder Fluggeschwindigkeit.' },
-                    { name: 'Druiden-Zirkel', desc: 'Wähle deinen Druiden-Zirkel (Kreis des Landes oder Kreis des Mondes).' }
-                ],
-                spellSlots: { 1: 3, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-            },
-            3: {
-                features: [],
-                spellSlots: { 1: 4, 2: 2, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-                spellsKnown: 2
-            },
-            4: {
-                features: [
-                    { name: 'Attributsverbesserung', desc: 'Du erhältst +2 auf ein Attribut oder +1 auf zwei verschiedene Attribute (oder ein Talent).' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-                cantripsKnown: 3,
-                abilityImprovement: true
-            },
-            5: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 2, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-            },
-            6: {
-                features: [
-                    { name: 'Zirkel-Feature', desc: 'Du erhältst ein Feature deines gewählten Druiden-Zirkels.' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-            },
-            7: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 1, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 }
-            },
-            8: {
-                features: [
-                    { name: 'Attributsverbesserung', desc: 'Du erhältst +2 auf ein Attribut oder +1 auf zwei verschiedene Attribute (oder ein Talent).' },
-                    { name: 'Wildgestalt-Verbesserung', desc: 'Schwimmgeschwindigkeit erlaubt (Kreis des Landes) oder CR 1 (Kreis des Mondes).' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 2, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 },
-                abilityImprovement: true
-            },
-            9: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1, 6: 0, 7: 0, 8: 0, 9: 0 }
-            },
-            10: {
-                features: [
-                    { name: 'Zirkel-Feature', desc: 'Du erhältst ein weiteres Feature deines Druiden-Zirkels.' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 0, 7: 0, 8: 0, 9: 0 },
-                cantripsKnown: 4
-            },
-            11: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 0, 8: 0, 9: 0 }
-            },
-            12: {
-                features: [
-                    { name: 'Attributsverbesserung', desc: 'Du erhältst +2 auf ein Attribut oder +1 auf zwei verschiedene Attribute (oder ein Talent).' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 0, 8: 0, 9: 0 },
-                abilityImprovement: true
-            },
-            13: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 0, 9: 0 }
-            },
-            14: {
-                features: [
-                    { name: 'Zirkel-Feature', desc: 'Du erhältst ein weiteres Feature deines Druiden-Zirkels.' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 0, 9: 0 }
-            },
-            15: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 0 }
-            },
-            16: {
-                features: [
-                    { name: 'Attributsverbesserung', desc: 'Du erhältst +2 auf ein Attribut oder +1 auf zwei verschiedene Attribute (oder ein Talent).' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 0 },
-                abilityImprovement: true
-            },
-            17: {
-                features: [],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 }
-            },
-            18: {
-                features: [
-                    { name: 'Zeitlose Gestalt', desc: 'Du alterst nur noch 1 Jahr pro 10 Jahren und kannst nicht magisch gealtert werden.' },
-                    { name: 'Bestiengestalt', desc: 'Du kannst Zauber in Tierform wirken.' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 }
-            },
-            19: {
-                features: [
-                    { name: 'Attributsverbesserung', desc: 'Du erhältst +2 auf ein Attribut oder +1 auf zwei verschiedene Attribute (oder ein Talent).' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
-                abilityImprovement: true
-            },
-            20: {
-                features: [
-                    { name: 'Erz-Druide', desc: 'Du kannst deine Wildgestalt unbegrenzt oft nutzen. Zudem ignorierst du verbale und somatische Komponenten deiner Druiden-Zauber und kannst nicht von nicht-magischen Pflanzen behindert werden.' }
-                ],
-                spellSlots: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 2, 8: 1, 9: 1 }
-            }
-        };
-
-        function showLevelUpGuide(oldLevel, newLevel) {
-            const levelData = druidLevelUpData[newLevel];
-            if (!levelData) {
-                console.warn('No level-up data for level', newLevel);
-                return;
-            }
-
-            // Set subtitle
-            document.getElementById('levelUpSubtitle').textContent = `Level ${oldLevel} → Level ${newLevel}`;
-
-            let content = '';
-
-            // Features
-            if (levelData.features && levelData.features.length > 0) {
-                const sectionClass = levelData.abilityImprovement ? 'level-up-section ability-improvement' : 'level-up-section';
-                content += `
-                    <div class="${sectionClass}">
-                        <h3>🌟 Neue Features</h3>
-                        ${levelData.features.map(feature => `
-                            <div class="level-up-feature">
-                                <div class="level-up-feature-name">${feature.name}</div>
-                                <div class="level-up-feature-desc">${feature.desc}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            }
-
-            // Spell Slots
-            if (levelData.spellSlots) {
-                const oldLevelData = druidLevelUpData[oldLevel];
-                const oldSlots = oldLevelData?.spellSlots || {};
-
-                let changedSlots = [];
-                for (let level = 1; level <= 9; level++) {
-                    const newCount = levelData.spellSlots[level] || 0;
-                    const oldCount = oldSlots[level] || 0;
-                    if (newCount !== oldCount) {
-                        changedSlots.push({ level, oldCount, newCount });
-                    }
-                }
-
-                if (changedSlots.length > 0) {
-                    content += `
-                        <div class="level-up-section">
-                            <h3>✨ Zauberplätze</h3>
-                            <table class="spell-slots-table">
-                                <tr>
-                                    <th>Grad</th>
-                                    ${changedSlots.map(slot => `<th>${slot.level}</th>`).join('')}
-                                </tr>
-                                <tr>
-                                    <td><strong>Neu</strong></td>
-                                    ${changedSlots.map(slot => `<td>${slot.newCount}</td>`).join('')}
-                                </tr>
-                            </table>
-                        </div>
-                    `;
-                }
-            }
-
-            // Cantrips
-            if (levelData.cantripsKnown) {
-                content += `
-                    <div class="level-up-section">
-                        <h3>🔮 Zaubertricks</h3>
-                        <p>Du kannst jetzt <strong>${levelData.cantripsKnown}</strong> Zaubertricks (Cantrips) kennen.</p>
-                    </div>
-                `;
-            }
-
-            // Spells Known
-            if (levelData.spellsKnown) {
-                content += `
-                    <div class="level-up-section">
-                        <h3>📚 Zauber</h3>
-                        <p>Du kannst <strong>${levelData.spellsKnown}</strong> neue Zauber lernen.</p>
-                    </div>
-                `;
-            }
-
-            // Proficiency Bonus Update
-            const newProfBonus = Math.floor((newLevel - 1) / 4) + 2;
-            const oldProfBonus = Math.floor((oldLevel - 1) / 4) + 2;
-            if (newProfBonus > oldProfBonus) {
-                content += `
-                    <div class="level-up-section">
-                        <h3>⬆️ Übungsbonus</h3>
-                        <p>Dein Übungsbonus steigt auf <strong>+${newProfBonus}</strong>!</p>
-                    </div>
-                `;
-            }
-
-            // Set content
-            document.getElementById('levelUpBody').innerHTML = content;
-
-            // Show modal
-            document.getElementById('levelUpModal').classList.add('show');
-        }
-
-        function closeLevelUpModal() {
-            document.getElementById('levelUpModal').classList.remove('show');
-        }
     </script>
 </body>
 </html>

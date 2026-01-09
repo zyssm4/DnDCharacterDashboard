@@ -452,7 +452,47 @@ if ($method === 'GET') {
                 ]
             ]);
             break;
-            
+
+        // Get all characters (for debugging/testing)
+        case 'all_characters':
+            $stmt = $pdo->query("
+                SELECT id, name, class, level, race, background,
+                       strength, dexterity, constitution, intelligence, wisdom, charisma,
+                       armor_class, current_hp, max_hp
+                FROM characters
+                ORDER BY id DESC
+            ");
+            $characters = $stmt->fetchAll();
+            echo json_encode(['success' => true, 'data' => $characters]);
+            break;
+
+        // Get beast shapes for wildshape
+        case 'beast_shapes':
+            $level = $_GET['level'] ?? null;
+            $cr = $_GET['cr'] ?? null;
+
+            $query = "SELECT * FROM beast_shapes WHERE 1=1";
+            $params = [];
+
+            if ($level !== null) {
+                $query .= " AND min_level <= ?";
+                $params[] = intval($level);
+            }
+
+            if ($cr !== null) {
+                $query .= " AND cr = ?";
+                $params[] = floatval($cr);
+            }
+
+            $query .= " ORDER BY cr ASC, name_de ASC";
+
+            $stmt = $pdo->prepare($query);
+            $stmt->execute($params);
+            $beasts = $stmt->fetchAll();
+
+            echo json_encode(['success' => true, 'data' => $beasts]);
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Invalid action']);
@@ -472,53 +512,80 @@ else if ($method === 'POST') {
         
         // Create new character
         case 'create_character':
-            $stmt = $pdo->prepare("
-                INSERT INTO characters (
-                    name, level, druid_circle,
-                    strength, dexterity, constitution,
-                    intelligence, wisdom, charisma,
-                    armor_class, current_hp, max_hp,
-                    spell_slots, prepared_spells,
-                    inventory, equipped_items,
-                    saving_throw_proficiencies, skill_proficiencies
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ");
+            try {
+                // Define saving throw proficiencies by class
+                $savingThrowsByClass = [
+                    'Druide' => ['intelligence', 'wisdom'],
+                    'Schurke' => ['dexterity', 'intelligence'],
+                    'Barde' => ['dexterity', 'charisma'],
+                    'Magier' => ['intelligence', 'wisdom'],
+                    'Paladin' => ['wisdom', 'charisma']
+                ];
 
-            $spellSlots = json_encode($input['spell_slots'] ?? []);
-            $preparedSpells = json_encode($input['prepared_spells'] ?? []);
-            $inventory = json_encode($input['inventory'] ?? []);
-            $equippedItems = json_encode($input['equipped_items'] ?? []);
-            $savingThrowProfs = json_encode($input['saving_throw_proficiencies'] ?? ['intelligence', 'wisdom']);
-            $skillProfs = json_encode($input['skill_proficiencies'] ?? []);
+                $characterClass = $input['class'] ?? 'Druide';
+                $savingThrows = $savingThrowsByClass[$characterClass] ?? ['wisdom', 'intelligence'];
 
-            $stmt->execute([
-                $input['name'] ?? 'Unbenannter Druide',
-                $input['level'] ?? 1,
-                $input['druid_circle'] ?? 'land',
-                $input['strength'] ?? 10,
-                $input['dexterity'] ?? 10,
-                $input['constitution'] ?? 10,
-                $input['intelligence'] ?? 10,
-                $input['wisdom'] ?? 10,
-                $input['charisma'] ?? 10,
-                $input['armor_class'] ?? 10,
-                $input['current_hp'] ?? 8,
-                $input['max_hp'] ?? 8,
-                $spellSlots,
-                $preparedSpells,
-                $inventory,
-                $equippedItems,
-                $savingThrowProfs,
-                $skillProfs
-            ]);
+                $stmt = $pdo->prepare("
+                    INSERT INTO characters (
+                        name, level, class, druid_circle, race, background,
+                        strength, dexterity, constitution,
+                        intelligence, wisdom, charisma,
+                        armor_class, current_hp, max_hp,
+                        spell_slots, prepared_spells,
+                        inventory, equipped_items,
+                        saving_throw_proficiencies, skill_proficiencies
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ");
 
-            $charId = $pdo->lastInsertId();
+                $spellSlots = json_encode($input['spell_slots'] ?? []);
+                $knownSpells = json_encode($input['known_spells'] ?? []);
+                $inventory = json_encode($input['inventory'] ?? []);
+                $equippedItems = json_encode($input['equipped_items'] ?? []);
+                $savingThrowProfs = json_encode($savingThrows);
+                $skillProfs = json_encode($input['skill_proficiencies'] ?? []);
 
-            echo json_encode([
-                'success' => true,
-                'message' => 'Character created',
-                'character_id' => $charId
-            ]);
+                $result = $stmt->execute([
+                    $input['name'] ?? 'Unbenannter Charakter',
+                    $input['level'] ?? 1,
+                    $characterClass,
+                    $input['druid_circle'] ?? null,
+                    $input['race'] ?? null,
+                    $input['background'] ?? null,
+                    $input['strength'] ?? 10,
+                    $input['dexterity'] ?? 10,
+                    $input['constitution'] ?? 10,
+                    $input['intelligence'] ?? 10,
+                    $input['wisdom'] ?? 10,
+                    $input['charisma'] ?? 10,
+                    $input['armor_class'] ?? 10,
+                    $input['current_hp'] ?? 8,
+                    $input['max_hp'] ?? 8,
+                    $spellSlots,
+                    $knownSpells,
+                    $inventory,
+                    $equippedItems,
+                    $savingThrowProfs,
+                    $skillProfs
+                ]);
+
+                if (!$result) {
+                    throw new Exception('Database insert failed: ' . implode(', ', $stmt->errorInfo()));
+                }
+
+                $charId = $pdo->lastInsertId();
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Character created',
+                    'character_id' => $charId
+                ]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
+            }
             break;
             
         // Update character

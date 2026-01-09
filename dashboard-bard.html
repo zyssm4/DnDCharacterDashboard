@@ -421,6 +421,55 @@
             flex: 1;
         }
 
+        .rest-button-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .rest-tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1000;
+            background: rgba(42, 42, 112, 0.98);
+            color: #e3f2fd;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #42a5f5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 280px;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .rest-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #42a5f5 transparent transparent transparent;
+        }
+
+        .rest-button-wrapper:hover .rest-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .rest-tooltip strong {
+            color: #bbdefb;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
         .feature-list {
             max-height: 300px;
             overflow-y: auto;
@@ -512,9 +561,11 @@
     <nav class="navbar">
         <h1>🎵 <span id="characterName">Barde</span> - Stufe <span id="characterLevel">1</span></h1>
         <div class="nav-menu">
+            <a href="dashboard-bard.html" class="nav-item">📊 Dashboard</a>
+            <a href="character-bard.html" class="nav-item">👤 Charakter</a>
+            <a href="spells-bard.html" class="nav-item">✨ Zauber</a>
+            <a href="equipment-bard.html" class="nav-item">⚔️ Ausrüstung</a>
             <a href="class-selection.html" class="nav-item">🎲 Klassenauswahl</a>
-            <a href="#" class="nav-item" onclick="showEquipmentTab()">⚔️ Ausrüstung</a>
-            <a href="#" class="nav-item" onclick="showNotesTab()">📜 Notizen</a>
         </div>
     </nav>
 
@@ -630,8 +681,27 @@
                     </div>
 
                     <div class="rest-section">
-                        <button class="btn" onclick="shortRest()">Kurze Rast</button>
-                        <button class="btn" onclick="longRest()">Lange Rast</button>
+                        <div class="rest-button-wrapper">
+                            <button class="btn" onclick="shortRest()">☀️ Kurze Rast</button>
+                            <div class="rest-tooltip">
+                                <strong>Kurze Rast (1 Stunde)</strong><br>
+                                • Trefferwürfel ausgeben für HP-Heilung<br>
+                                • Bardische Inspiration zurück<br>
+                                • Bestimmte Klassenmerkmale erneuert<br>
+                                (z.B. Song of Rest)
+                            </div>
+                        </div>
+                        <div class="rest-button-wrapper">
+                            <button class="btn" onclick="longRest()">🌙 Lange Rast</button>
+                            <div class="rest-tooltip">
+                                <strong>Lange Rast (8 Stunden)</strong><br>
+                                • Alle Trefferpunkte wiederhergestellt<br>
+                                • Alle Zauberplätze zurück<br>
+                                • Alle Trefferwürfel zurück (bis zu 50% deines Maximums)<br>
+                                • Bardische Inspiration zurück<br>
+                                • Die meisten Klassenmerkmale erneuert
+                            </div>
+                        </div>
                     </div>
                 </div>
 

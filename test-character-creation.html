@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Creation Tests</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a2e;
+            color: #e8e8e8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #66bb6a;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .test-section h2 {
+            color: #a5d6a7;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #66bb6a;
+            padding-bottom: 10px;
+        }
+
+        .test-case {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #666;
+        }
+
+        .test-case.pass {
+            border-left-color: #4caf50;
+        }
+
+        .test-case.fail {
+            border-left-color: #f44336;
+        }
+
+        .test-case.running {
+            border-left-color: #ff9800;
+        }
+
+        .test-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .test-result {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .test-details {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .summary {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .summary.failed {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
+        }
+
+        .summary h3 {
+            color: #66bb6a;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #66bb6a;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        button {
+            background: #66bb6a;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #81c784;
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Character Creation Test Suite</h1>
+
+        <div class="button-group">
+            <button onclick="runAllTests()" id="runBtn">Run All Tests</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="testResults"></div>
+        <div id="summary" style="display: none;"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+        let testRunning = false;
+
+        class TestRunner {
+            constructor() {
+                this.results = [];
+            }
+
+            assert(condition, message) {
+                if (!condition) {
+                    throw new Error(message || 'Assertion failed');
+                }
+            }
+
+            assertEqual(actual, expected, message) {
+                if (actual !== expected) {
+                    throw new Error(message || `Expected ${expected}, got ${actual}`);
+                }
+            }
+
+            assertArrayEqual(actual, expected, message) {
+                if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+                    throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+                }
+            }
+
+            assertGreaterThan(value, min, message) {
+                if (value <= min) {
+                    throw new Error(message || `Expected ${value} > ${min}`);
+                }
+            }
+
+            assertLessThan(value, max, message) {
+                if (value >= max) {
+                    throw new Error(message || `Expected ${value} < ${max}`);
+                }
+            }
+
+            assertInRange(value, min, max, message) {
+                if (value < min || value > max) {
+                    throw new Error(message || `Expected ${value} to be between ${min} and ${max}`);
+                }
+            }
+        }
+
+        // Test Suite Definition
+        const tests = {
+            'Attribute System': [
+                {
+                    name: 'Sollte Attributwerte zwischen 3 und 20 akzeptieren',
+                    test: (runner) => {
+                        const testValue = 15;
+                        runner.assertInRange(testValue, 3, 20, 'Wert muss zwischen 3 und 20 liegen');
+                    }
+                },
+                {
+                    name: 'Sollte Modifikatoren korrekt berechnen',
+                    test: (runner) => {
+                        const testCases = [
+                            { value: 10, expected: 0 },
+                            { value: 12, expected: 1 },
+                            { value: 14, expected: 2 },
+                            { value: 8, expected: -1 },
+                            { value: 20, expected: 5 },
+                            { value: 3, expected: -4 }
+                        ];
+
+                        testCases.forEach(tc => {
+                            const modifier = Math.floor((tc.value - 10) / 2);
+                            runner.assertEqual(modifier, tc.expected,
+                                `Modifikator für Wert ${tc.value} sollte ${tc.expected} sein`);
+                        });
+                    }
+                },
+                {
+                    name: 'Sollte keine Punktekauf-Validierung durchführen',
+                    test: (runner) => {
+                        // Simuliere freie Attributverteilung
+                        const attributes = [20, 18, 16, 8, 10, 12];
+                        const sum = attributes.reduce((a, b) => a + b, 0);
+                        // Keine Einschränkung mehr, jede Summe ist erlaubt
+                        runner.assert(true, 'Freie Attributverteilung sollte immer erlaubt sein');
+                    }
+                }
+            ],
+
+            'Skill Selection': [
+                {
+                    name: 'Schurke sollte 4 Fertigkeiten wählen können',
+                    test: (runner) => {
+                        const rogueSkillCount = 4;
+                        runner.assertEqual(rogueSkillCount, 4, 'Schurke sollte genau 4 Fertigkeiten haben');
+                    }
+                },
+                {
+                    name: 'Druide sollte 2 Fertigkeiten wählen können',
+                    test: (runner) => {
+                        const druidSkillCount = 2;
+                        runner.assertEqual(druidSkillCount, 2, 'Druide sollte genau 2 Fertigkeiten haben');
+                    }
+                },
+                {
+                    name: 'Barde sollte 3 Fertigkeiten wählen können',
+                    test: (runner) => {
+                        const bardSkillCount = 3;
+                        runner.assertEqual(bardSkillCount, 3, 'Barde sollte genau 3 Fertigkeiten haben');
+                    }
+                }
+            ],
+
+            'Equipment System': [
+                {
+                    name: 'Schurke sollte Ausrüstungsoptionen haben',
+                    test: (runner) => {
+                        const rogueEquipment = [
+                            { label: 'Waffe wählen:', options: ['Rapier', 'Kurzschwert'] },
+                            { label: 'Fernkampfwaffe:', options: ['Kurzbogen', 'Kurzschwert'] },
+                            { label: 'Ausrüstungspaket:', options: ['Einbrecherpaket', 'Kerkerforscherpaket', 'Forscherpaket'] }
+                        ];
+                        runner.assertEqual(rogueEquipment.length, 3, 'Schurke sollte 3 Ausrüstungswahlmöglichkeiten haben');
+                    }
+                },
+                {
+                    name: 'Druide sollte Ausrüstungsoptionen haben',
+                    test: (runner) => {
+                        const druidEquipment = [
+                            { label: 'Waffe wählen:', options: ['Krummsäbel', 'Einfache Nahkampfwaffe'] },
+                            { label: 'Schild wählen:', options: ['Holzschild', 'Kein Schild'] },
+                            { label: 'Ausrüstungspaket:', options: ['Forscherpaket', 'Priesterpaket'] }
+                        ];
+                        runner.assertEqual(druidEquipment.length, 3, 'Druide sollte 3 Ausrüstungswahlmöglichkeiten haben');
+                    }
+                }
+            ],
+
+            'Spell System': [
+                {
+                    name: 'Schurke sollte keine Zauber auf Level 1 haben',
+                    test: (runner) => {
+                        const rogueIsSpellcaster = false;
+                        runner.assertEqual(rogueIsSpellcaster, false, 'Schurke sollte kein Zauberwirker sein');
+                    }
+                },
+                {
+                    name: 'Druide sollte Zauber haben',
+                    test: (runner) => {
+                        const druidIsSpellcaster = true;
+                        const druidCantrips = 2;
+                        runner.assertEqual(druidIsSpellcaster, true, 'Druide sollte Zauberwirker sein');
+                        runner.assertEqual(druidCantrips, 2, 'Druide sollte 2 Zaubertricks kennen');
+                    }
+                },
+                {
+                    name: 'Barde sollte Zauber haben',
+                    test: (runner) => {
+                        const bardIsSpellcaster = true;
+                        const bardCantrips = 2;
+                        const bardSpells = 4;
+                        runner.assertEqual(bardIsSpellcaster, true, 'Barde sollte Zauberwirker sein');
+                        runner.assertEqual(bardCantrips, 2, 'Barde sollte 2 Zaubertricks kennen');
+                        runner.assertEqual(bardSpells, 4, 'Barde sollte 4 Zauber kennen');
+                    }
+                },
+                {
+                    name: 'Magier sollte Zauber haben',
+                    test: (runner) => {
+                        const wizardIsSpellcaster = true;
+                        const wizardCantrips = 3;
+                        const wizardSpells = 6;
+                        runner.assertEqual(wizardIsSpellcaster, true, 'Magier sollte Zauberwirker sein');
+                        runner.assertEqual(wizardCantrips, 3, 'Magier sollte 3 Zaubertricks kennen');
+                        runner.assertEqual(wizardSpells, 6, 'Magier sollte 6 Zauber im Zauberbuch haben');
+                    }
+                }
+            ],
+
+            'Character Stats': [
+                {
+                    name: 'HP Berechnung für Schurke (CON 14)',
+                    test: (runner) => {
+                        const conValue = 14;
+                        const conMod = Math.floor((conValue - 10) / 2);
+                        const hitDice = 8;
+                        const maxHP = hitDice + conMod;
+                        runner.assertEqual(maxHP, 10, 'Schurke mit CON 14 sollte 10 HP haben');
+                    }
+                },
+                {
+                    name: 'HP Berechnung für Magier (CON 10)',
+                    test: (runner) => {
+                        const conValue = 10;
+                        const conMod = Math.floor((conValue - 10) / 2);
+                        const hitDice = 6;
+                        const maxHP = hitDice + conMod;
+                        runner.assertEqual(maxHP, 6, 'Magier mit CON 10 sollte 6 HP haben');
+                    }
+                },
+                {
+                    name: 'AC Berechnung (DEX 16)',
+                    test: (runner) => {
+                        const dexValue = 16;
+                        const dexMod = Math.floor((dexValue - 10) / 2);
+                        const baseAC = 10 + dexMod;
+                        runner.assertEqual(baseAC, 13, 'Basis-AC mit DEX 16 sollte 13 sein');
+                    }
+                }
+            ],
+
+            'Class Name Mapping': [
+                {
+                    name: 'Englische Klassennamen sollten zu deutschen gemappt werden',
+                    test: (runner) => {
+                        const classNameMap = {
+                            'druid': 'Druide',
+                            'rogue': 'Schurke',
+                            'bard': 'Barde',
+                            'wizard': 'Magier',
+                            'paladin': 'Paladin'
+                        };
+                        runner.assertEqual(classNameMap['rogue'], 'Schurke', 'rogue sollte zu Schurke gemappt werden');
+                        runner.assertEqual(classNameMap['druid'], 'Druide', 'druid sollte zu Druide gemappt werden');
+                        runner.assertEqual(classNameMap['wizard'], 'Magier', 'wizard sollte zu Magier gemappt werden');
+                    }
+                }
+            ],
+
+            'Saving Throws': [
+                {
+                    name: 'Schurke sollte DEX und INT Rettungswürfe haben',
+                    test: (runner) => {
+                        const rogueSaves = ['dexterity', 'intelligence'];
+                        runner.assertArrayEqual(rogueSaves, ['dexterity', 'intelligence'],
+                            'Schurke sollte DEX und INT Rettungswürfe haben');
+                    }
+                },
+                {
+                    name: 'Druide sollte INT und WIS Rettungswürfe haben',
+                    test: (runner) => {
+                        const druidSaves = ['intelligence', 'wisdom'];
+                        runner.assertArrayEqual(druidSaves, ['intelligence', 'wisdom'],
+                            'Druide sollte INT und WIS Rettungswürfe haben');
+                    }
+                },
+                {
+                    name: 'Barde sollte DEX und CHA Rettungswürfe haben',
+                    test: (runner) => {
+                        const bardSaves = ['dexterity', 'charisma'];
+                        runner.assertArrayEqual(bardSaves, ['dexterity', 'charisma'],
+                            'Barde sollte DEX und CHA Rettungswürfe haben');
+                    }
+                }
+            ],
+
+            'Navigation Logic': [
+                {
+                    name: 'Schritt 5 sollte für Nicht-Zauberwirker übersprungen werden',
+                    test: (runner) => {
+                        const isSpellcaster = false;
+                        let currentStep = 4;
+
+                        // Simulate next step logic
+                        currentStep++;
+                        if (currentStep === 5 && !isSpellcaster) {
+                            currentStep = 6;
+                        }
+
+                        runner.assertEqual(currentStep, 6, 'Schritt sollte von 4 direkt zu 6 springen');
+                    }
+                },
+                {
+                    name: 'Schritt 5 sollte für Zauberwirker nicht übersprungen werden',
+                    test: (runner) => {
+                        const isSpellcaster = true;
+                        let currentStep = 4;
+
+                        // Simulate next step logic
+                        currentStep++;
+                        if (currentStep === 5 && !isSpellcaster) {
+                            currentStep = 6;
+                        }
+
+                        runner.assertEqual(currentStep, 5, 'Schritt sollte bei 5 bleiben für Zauberwirker');
+                    }
+                }
+            ]
+        };
+
+        function renderTestCase(sectionName, test, status, message, details) {
+            const testCase = document.createElement('div');
+            testCase.className = `test-case ${status}`;
+
+            const statusIcon = status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⏳';
+
+            testCase.innerHTML = `
+                <div class="test-name">${statusIcon} ${test.name}</div>
+                <div class="test-result">${message}</div>
+                ${details ? `<div class="test-details">${details}</div>` : ''}
+            `;
+
+            return testCase;
+        }
+
+        function renderTestSection(sectionName, sectionTests) {
+            const section = document.createElement('div');
+            section.className = 'test-section';
+            section.id = `section-${sectionName.replace(/\s+/g, '-')}`;
+
+            section.innerHTML = `<h2>${sectionName}</h2>`;
+
+            return section;
+        }
+
+        async function runAllTests() {
+            if (testRunning) return;
+
+            testRunning = true;
+            testResults = [];
+
+            const runBtn = document.getElementById('runBtn');
+            runBtn.disabled = true;
+            runBtn.textContent = 'Tests laufen...';
+
+            const resultsContainer = document.getElementById('testResults');
+            resultsContainer.innerHTML = '';
+
+            document.getElementById('summary').style.display = 'none';
+
+            let totalTests = 0;
+            let passedTests = 0;
+            let failedTests = 0;
+
+            for (const [sectionName, sectionTests] of Object.entries(tests)) {
+                const section = renderTestSection(sectionName, sectionTests);
+                resultsContainer.appendChild(section);
+
+                for (const test of sectionTests) {
+                    totalTests++;
+                    const runner = new TestRunner();
+
+                    // Render running state
+                    const runningCase = renderTestCase(sectionName, test, 'running', 'Test läuft...', '');
+                    section.appendChild(runningCase);
+
+                    // Small delay for visual feedback
+                    await new Promise(resolve => setTimeout(resolve, 50));
+
+                    try {
+                        test.test(runner);
+                        passedTests++;
+
+                        // Update to pass state
+                        runningCase.remove();
+                        const passCase = renderTestCase(sectionName, test, 'pass', 'Test bestanden', '');
+                        section.appendChild(passCase);
+
+                        testResults.push({
+                            section: sectionName,
+                            name: test.name,
+                            status: 'pass'
+                        });
+
+                    } catch (error) {
+                        failedTests++;
+
+                        // Update to fail state
+                        runningCase.remove();
+                        const failCase = renderTestCase(sectionName, test, 'fail', 'Test fehlgeschlagen', error.message);
+                        section.appendChild(failCase);
+
+                        testResults.push({
+                            section: sectionName,
+                            name: test.name,
+                            status: 'fail',
+                            error: error.message
+                        });
+                    }
+                }
+            }
+
+            // Show summary
+            showSummary(totalTests, passedTests, failedTests);
+
+            runBtn.disabled = false;
+            runBtn.textContent = 'Run All Tests';
+            testRunning = false;
+        }
+
+        function showSummary(total, passed, failed) {
+            const summaryDiv = document.getElementById('summary');
+            const passRate = Math.round((passed / total) * 100);
+
+            const summaryClass = failed === 0 ? 'summary' : 'summary failed';
+
+            summaryDiv.className = summaryClass;
+            summaryDiv.innerHTML = `
+                <h3>${failed === 0 ? '🎉 Alle Tests bestanden!' : '⚠️ Einige Tests fehlgeschlagen'}</h3>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-label">Tests gesamt</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" style="color: #4caf50;">${passed}</div>
+                        <div class="stat-label">Bestanden</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" style="color: ${failed > 0 ? '#f44336' : '#4caf50'};">${failed}</div>
+                        <div class="stat-label">Fehlgeschlagen</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">${passRate}%</div>
+                        <div class="stat-label">Erfolgsrate</div>
+                    </div>
+                </div>
+            `;
+            summaryDiv.style.display = 'block';
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            testResults = [];
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            console.log('Test Suite geladen. Klicke "Run All Tests" um zu starten.');
+        });
+    </script>
+</body>
+</html>

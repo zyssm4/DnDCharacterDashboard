@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ausrüstung - Druiden Tracker</title>
+    <title>Ausrüstung - Magier Tracker</title>
     <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
     <link rel="stylesheet" href="assets/css/shared-styles.css">
     <style>
@@ -15,8 +15,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2d5016 0%, #1a2f0d 100%);
-            color: #e8f5e9;
+            background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
+            color: #e3f2fd;
             min-height: 100vh;
             padding: 20px;
         }
@@ -33,7 +33,7 @@
         }
 
         nav a {
-            color: #a5d6a7;
+            color: #42a5f5;
             text-decoration: none;
             padding: 8px 16px;
             border-radius: 5px;
@@ -42,11 +42,11 @@
 
         nav a:hover {
             background: rgba(165, 214, 167, 0.2);
-            color: #c8e6c9;
+            color: #bbdefb;
         }
 
         nav a.active {
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
         }
 
@@ -58,7 +58,7 @@
         h1 {
             text-align: center;
             margin-bottom: 30px;
-            color: #c8e6c9;
+            color: #bbdefb;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
@@ -77,10 +77,10 @@
         }
 
         .section h2 {
-            color: #a5d6a7;
+            color: #42a5f5;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #4caf50;
+            border-bottom: 2px solid #42a5f5;
         }
 
         /* Equipped Items */
@@ -91,7 +91,7 @@
 
         .equipment-slot {
             background: rgba(76, 175, 80, 0.1);
-            border: 2px solid #4caf50;
+            border: 2px solid #42a5f5;
             border-radius: 10px;
             padding: 15px;
         }
@@ -109,20 +109,20 @@
         }
 
         .slot-name {
-            color: #a5d6a7;
+            color: #42a5f5;
             font-weight: 600;
             font-size: 14px;
         }
 
         .item-name {
-            color: #c8e6c9;
+            color: #bbdefb;
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 8px;
         }
 
         .item-details {
-            color: #a5d6a7;
+            color: #42a5f5;
             font-size: 14px;
             line-height: 1.6;
         }
@@ -153,14 +153,14 @@
             flex: 1;
             padding: 10px;
             border-radius: 5px;
-            border: 2px solid #4caf50;
+            border: 2px solid #42a5f5;
             background: rgba(255, 255, 255, 0.1);
-            color: #e8f5e9;
+            color: #e3f2fd;
         }
 
         .btn-add {
             padding: 10px 20px;
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
             border: none;
             border-radius: 5px;
@@ -182,7 +182,7 @@
 
         .inventory-item {
             background: rgba(76, 175, 80, 0.1);
-            border: 2px solid #4caf50;
+            border: 2px solid #42a5f5;
             border-radius: 8px;
             padding: 12px;
             display: flex;
@@ -200,78 +200,22 @@
         }
 
         .item-info-name {
-            color: #c8e6c9;
+            color: #bbdefb;
             font-weight: bold;
             margin-bottom: 4px;
         }
 
         .item-info-type {
-            color: #a5d6a7;
+            color: #42a5f5;
             font-size: 13px;
         }
 
         .item-info-description {
-            color: #81c784;
+            color: #90caf9;
             font-size: 12px;
             margin-top: 4px;
             font-style: italic;
             line-height: 1.4;
-        }
-
-        .item-quantity {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            padding: 6px 10px;
-            background: rgba(76, 175, 80, 0.15);
-            border-radius: 5px;
-            border: 1px solid #4caf50;
-        }
-
-        .quantity-label {
-            color: #a5d6a7;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .quantity-btn {
-            width: 28px;
-            height: 28px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .quantity-btn:hover {
-            background: #45a049;
-            transform: scale(1.1);
-        }
-
-        .quantity-btn:active {
-            transform: scale(0.95);
-        }
-
-        .quantity-value {
-            min-width: 30px;
-            text-align: center;
-            color: #c8e6c9;
-            font-weight: bold;
-            font-size: 15px;
         }
 
         .item-actions {
@@ -281,7 +225,7 @@
 
         .btn-equip {
             padding: 6px 12px;
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
             border: none;
             border-radius: 5px;
@@ -345,13 +289,13 @@
         }
 
         .modal-header h2 {
-            color: #c8e6c9;
+            color: #bbdefb;
         }
 
         .btn-close {
             background: none;
             border: none;
-            color: #e8f5e9;
+            color: #e3f2fd;
             font-size: 24px;
             cursor: pointer;
             padding: 0;
@@ -365,7 +309,7 @@
 
         .form-group label {
             display: block;
-            color: #c8e6c9;
+            color: #bbdefb;
             margin-bottom: 5px;
             font-weight: 600;
         }
@@ -376,9 +320,9 @@
             width: 100%;
             padding: 10px;
             border-radius: 5px;
-            border: 2px solid #4caf50;
+            border: 2px solid #42a5f5;
             background: rgba(255, 255, 255, 0.1);
-            color: #e8f5e9;
+            color: #e3f2fd;
             font-size: 14px;
         }
 
@@ -390,7 +334,7 @@
         .btn-submit {
             width: 100%;
             padding: 12px;
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
             border: none;
             border-radius: 5px;
@@ -424,7 +368,7 @@
             margin: 0;
             cursor: pointer;
             flex: 1;
-            color: #c8e6c9;
+            color: #bbdefb;
         }
 
         .conditional-fields {
@@ -433,7 +377,7 @@
             padding: 15px;
             background: rgba(76, 175, 80, 0.05);
             border-radius: 5px;
-            border-left: 3px solid #4caf50;
+            border-left: 3px solid #42a5f5;
         }
 
         .conditional-fields.show {
@@ -450,7 +394,7 @@
 
         .btn-save {
             padding: 12px 32px;
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
             border: none;
             border-radius: 8px;
@@ -491,7 +435,7 @@
 
         .save-indicator.success {
             background: rgba(76, 175, 80, 0.3);
-            color: #c8e6c9;
+            color: #bbdefb;
             display: block;
         }
 
@@ -580,7 +524,7 @@
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #a5d6a7;
+            color: #42a5f5;
             font-size: 16px;
             opacity: 0.7;
         }
@@ -597,7 +541,7 @@
             left: 0;
             right: 0;
             background: rgba(29, 60, 16, 0.98);
-            border: 2px solid #4caf50;
+            border: 2px solid #42a5f5;
             border-top: none;
             border-radius: 0 0 5px 5px;
             max-height: 300px;
@@ -626,20 +570,20 @@
         }
 
         .search-result-name {
-            color: #c8e6c9;
+            color: #bbdefb;
             font-weight: bold;
             margin-bottom: 4px;
         }
 
         .search-result-details {
-            color: #a5d6a7;
+            color: #42a5f5;
             font-size: 12px;
         }
 
         .search-loading {
             padding: 15px;
             text-align: center;
-            color: #a5d6a7;
+            color: #42a5f5;
         }
 
         .search-mode-toggle {
@@ -652,8 +596,8 @@
             flex: 1;
             padding: 8px;
             background: rgba(76, 175, 80, 0.1);
-            border: 2px solid #4caf50;
-            color: #a5d6a7;
+            border: 2px solid #42a5f5;
+            color: #42a5f5;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
@@ -661,7 +605,7 @@
         }
 
         .search-mode-btn.active {
-            background: #4caf50;
+            background: #42a5f5;
             color: white;
         }
 
@@ -705,10 +649,10 @@
     </div>
 
     <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="character.html">Charakter</a>
-        <a href="spells.html">Zauber</a>
-        <a href="equipment.html" class="active">Ausrüstung</a>
+        <a href="dashboard-wizard.html">Dashboard</a>
+        <a href="character-wizard.html">Charakter</a>
+        <a href="spells-wizard.html">Zauber</a>
+        <a href="equipment-wizard.html" class="active">Ausrüstung</a>
     </nav>
 
     <div class="container">
@@ -1026,7 +970,6 @@
 
             grid.innerHTML = inventory.map((item, index) => {
                 const canEquip = ['weapon', 'armor', 'shield', 'magic'].includes(item.type);
-                const isStackableItem = item.quantity !== undefined;
 
                 // Build item details/description
                 let details = [];
@@ -1047,16 +990,6 @@
                             <div class="item-info-name">${item.name}</div>
                             <div class="item-info-type">${getTypeLabel(item.type)}${item.weight ? ` • ${item.weight} Pfund` : ''}</div>
                             ${details.length > 0 ? `<div class="item-info-description">${details.join(' • ')}</div>` : ''}
-                            ${isStackableItem ? `
-                                <div class="item-quantity">
-                                    <span class="quantity-label">Anzahl:</span>
-                                    <div class="quantity-controls">
-                                        <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">−</button>
-                                        <span class="quantity-value">${item.quantity}</span>
-                                        <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                                    </div>
-                                </div>
-                            ` : ''}
                         </div>
                         <div class="item-actions">
                             ${canEquip ? `<button class="btn-equip" onclick="equipItem(${index})">Ausrüsten</button>` : ''}
@@ -1245,7 +1178,6 @@
             grid.innerHTML = filtered.map((item) => {
                 const index = inventory.indexOf(item);
                 const canEquip = ['weapon', 'armor', 'shield', 'magic'].includes(item.type);
-                const isStackableItem = item.quantity !== undefined;
 
                 // Build item details/description
                 let details = [];
@@ -1266,16 +1198,6 @@
                             <div class="item-info-name">${item.name}</div>
                             <div class="item-info-type">${getTypeLabel(item.type)}${item.weight ? ` • ${item.weight} Pfund` : ''}</div>
                             ${details.length > 0 ? `<div class="item-info-description">${details.join(' • ')}</div>` : ''}
-                            ${isStackableItem ? `
-                                <div class="item-quantity">
-                                    <span class="quantity-label">Anzahl:</span>
-                                    <div class="quantity-controls">
-                                        <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">−</button>
-                                        <span class="quantity-value">${item.quantity}</span>
-                                        <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                                    </div>
-                                </div>
-                            ` : ''}
                         </div>
                         <div class="item-actions">
                             ${canEquip ? `<button class="btn-equip" onclick="equipItem(${index})">Ausrüsten</button>` : ''}
@@ -1583,7 +1505,7 @@
         }
 
         function goBack() {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard-wizard.html';
         }
 
         function getTypeLabel(type) {

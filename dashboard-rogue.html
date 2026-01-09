@@ -461,9 +461,10 @@
     <nav class="navbar">
         <h1>🏴‍☠️ <span id="characterName">Schurke</span> - Stufe <span id="characterLevel">1</span></h1>
         <div class="nav-menu">
+            <a href="dashboard-rogue.html" class="nav-item">📊 Dashboard</a>
+            <a href="character-rogue.html" class="nav-item">👤 Charakter</a>
+            <a href="equipment-rogue.html" class="nav-item">⚔️ Ausrüstung</a>
             <a href="class-selection.html" class="nav-item">🎲 Klassenauswahl</a>
-            <a href="#" class="nav-item" onclick="showEquipmentTab()">⚔️ Ausrüstung</a>
-            <a href="#" class="nav-item" onclick="showNotesTab()">📜 Notizen</a>
         </div>
     </nav>
 
@@ -696,8 +697,17 @@
         async function loadCharacter() {
             try {
                 showLoading();
+                console.log('Loading rogue character...');
                 const response = await fetch(`${API_URL}?action=character&class=rogue`);
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const result = await response.json();
+                console.log('API Response:', result);
 
                 if (result.success && result.data) {
                     const char = result.data;
@@ -733,12 +743,24 @@
                     loadFeatures(char);
                     loadEquipment(char);
                     loadWeapons(char);
+
+                    showNotification('Charakter erfolgreich geladen!', 'success');
+                } else if (result.error === 'Character not found') {
+                    console.warn('No rogue character found in database');
+                    showNotification('Kein Schurken-Charakter gefunden. Erstelle einen neuen Charakter!', 'warning');
+
+                    // Redirect to character creation
+                    setTimeout(() => {
+                        if (confirm('Möchtest du einen neuen Schurken erstellen?')) {
+                            window.location.href = 'character-creation.html?class=rogue';
+                        }
+                    }, 1000);
                 } else {
-                    throw new Error('Kein Charakter gefunden');
+                    throw new Error(result.error || 'Unbekannter Fehler');
                 }
             } catch (error) {
                 console.error('Fehler beim Laden des Charakters:', error);
-                showNotification(error.message || 'Fehler beim Laden des Charakters', 'error');
+                showNotification('Fehler: ' + error.message, 'error');
             } finally {
                 hideLoading();
             }
@@ -977,13 +999,12 @@
         }
 
         function showEquipmentTab() {
-            alert('Ausrüstungsverwaltung wird geladen...');
-            // TODO: Navigate to equipment page
+            window.location.href = 'equipment-rogue.html';
         }
 
         function showNotesTab() {
-            alert('Notizfunktion wird geladen...');
-            // TODO: Navigate to notes page
+            // TODO: Implement notes functionality
+            alert('Notizfunktion wird in einem zukünftigen Update hinzugefügt!');
         }
 
         function showEquipmentBrowser() {
