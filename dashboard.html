@@ -1094,6 +1094,14 @@
                         <strong id="profBonus">+2</strong>
                         <button onclick="openProficiencyModal()" style="margin-left: 10px; padding: 4px 8px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em;">⚙️ Bearbeiten</button>
                     </div>
+                    <div class="info-row" style="margin-top: 10px; border-top: 1px solid rgba(76, 175, 80, 0.3); padding-top: 10px;">
+                        <span style="display: flex; align-items: center; gap: 5px;">💰 Währung:</span>
+                        <div style="display: flex; gap: 10px; font-size: 0.9em;">
+                            <span><strong id="goldCount">0</strong> GP</span>
+                            <span><strong id="silverCount">0</strong> SP</span>
+                            <span><strong id="copperCount">0</strong> CP</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card" style="margin-top: 20px;">
@@ -1625,6 +1633,9 @@
                 characterStats.armorClass = char.armor_class || 10;
                 characterStats.currentHP = char.current_hp || 8;
                 characterStats.maxHP = char.max_hp || 8;
+                characterStats.gold = char.gold || 0;
+                characterStats.silver = char.silver || 0;
+                characterStats.copper = char.copper || 0;
 
                 spellSlots = char.spell_slots || {};
                 preparedSpells = char.prepared_spells || [];
@@ -1639,6 +1650,11 @@
                 }
 
                 console.log('Equipped weapon loaded:', equippedWeapon);
+
+                // Update currency display
+                document.getElementById('goldCount').textContent = characterStats.gold;
+                document.getElementById('silverCount').textContent = characterStats.silver;
+                document.getElementById('copperCount').textContent = characterStats.copper;
 
                 updateDisplay();
             }

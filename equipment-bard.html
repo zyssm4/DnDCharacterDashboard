@@ -904,6 +904,10 @@
             magic: null
         };
 
+        let characterStats = {
+            dexterity: 10
+        };
+
         let searchMode = 'database'; // 'database' or 'inventory'
         let searchTimeout = null;
 
@@ -922,6 +926,16 @@
         async function loadInventoryData() {
             try {
                 showLoading();
+
+                // Load character stats for AC calculation
+                const charResponse = await fetch(`${API_URL}?action=character&id=${CHARACTER_ID}`);
+                const charData = await charResponse.json();
+
+                if (charData.success && charData.data) {
+                    characterStats.dexterity = charData.data.dexterity || 10;
+                }
+
+                // Load inventory
                 const response = await fetch(`${API_URL}?action=inventory&char_id=${CHARACTER_ID}`);
                 const data = await response.json();
 
@@ -1358,32 +1372,54 @@
             }
         }
 
-        async function updateCharacterAC() {
-            // This will calculate AC based on equipped armor and shield
-            // We'll implement this to update the character's AC field
-            try {
-                let baseAC = 10;
-                let dexMod = 0; // We'd need to fetch character stats for this
+        function calculateModifier(abilityScore) {
+            return Math.floor((abilityScore - 10) / 2);
+        }
 
-                // Calculate AC from armor
+        async function updateCharacterAC() {
+            // Calculate AC based on equipped armor, shield, and DEX modifier
+            try {
+                let calculatedAC = 10;
+                const dexMod = calculateModifier(characterStats.dexterity);
+
+                // Parse armor properties if armor is equipped
                 const armor = equippedItems.armor;
-                if (armor && armor.ac) {
-                    if (armor.ac_type === 'fixed') {
-                        baseAC = armor.ac;
-                    } else if (armor.ac_type === 'dex') {
-                        baseAC = armor.ac; // Will add DEX in character update
-                    } else if (armor.ac_type === 'dex_max2') {
-                        baseAC = armor.ac; // Will add DEX (max +2) in character update
+                if (armor && armor.properties) {
+                    const props = typeof armor.properties === 'string'
+                        ? JSON.parse(armor.properties)
+                        : armor.properties;
+
+                    const armorType = props.armor_type; // 'light', 'medium', 'heavy'
+                    const armorAC = armor.armor_class || armor.ac || 10;
+
+                    if (armorType === 'light') {
+                        // Light armor: AC + full DEX modifier
+                        calculatedAC = armorAC + dexMod;
+                    } else if (armorType === 'medium') {
+                        // Medium armor: AC + DEX modifier (max +2)
+                        calculatedAC = armorAC + Math.min(dexMod, 2);
+                    } else if (armorType === 'heavy') {
+                        // Heavy armor: AC only (no DEX)
+                        calculatedAC = armorAC;
+                    } else {
+                        // Fallback
+                        calculatedAC = armorAC + dexMod;
                     }
+                } else {
+                    // No armor: 10 + DEX modifier
+                    calculatedAC = 10 + dexMod;
                 }
 
                 // Add shield bonus
                 const shield = equippedItems.offhand;
-                if (shield && shield.type === 'shield' && shield.ac_bonus) {
-                    baseAC += shield.ac_bonus;
+                if (shield && shield.type === 'shield') {
+                    const shieldBonus = shield.armor_class || shield.ac_bonus || 2;
+                    calculatedAC += shieldBonus;
                 }
 
-                // Update character AC (simplified - would need full character data for DEX calculation)
+                console.log(`AC Calculation: Base=${armor ? armor.armor_class || armor.ac : 10}, DEX Mod=${dexMod}, Shield=${shield ? (shield.armor_class || shield.ac_bonus || 2) : 0}, Total=${calculatedAC}`);
+
+                // Update character AC in database
                 const response = await fetch(`${API_URL}?action=update_character_ac`, {
                     method: 'POST',
                     headers: {
@@ -1391,18 +1427,18 @@
                     },
                     body: JSON.stringify({
                         char_id: CHARACTER_ID,
-                        armor_class: baseAC,
-                        equipped_armor: armor,
-                        equipped_shield: shield
+                        armor_class: calculatedAC
                     })
                 });
 
                 const data = await response.json();
                 if (data.success) {
-                    console.log('AC updated successfully');
+                    console.log('AC updated successfully to:', calculatedAC);
+                    showNotification(`Rüstungsklasse aktualisiert: ${calculatedAC}`, 'success');
                 }
             } catch (error) {
                 console.error('Error updating AC:', error);
+                showNotification('Fehler beim Aktualisieren der Rüstungsklasse', 'error');
             }
         }
 
@@ -1412,6 +1448,11 @@
             if (item) {
                 inventory.push(item);
                 equippedItems[slot] = null;
+
+                // If unequipping armor or shield, update character's AC
+                if (item.type === 'armor' || item.type === 'shield') {
+                    await updateCharacterAC();
+                }
 
                 // Save to database
                 await saveInventory();

@@ -6,7 +6,11 @@
       "Bash(cat:*)",
       "Bash(done)",
       "Bash(for file in character-rogue.html equipment-rogue.html character-bard.html equipment-bard.html spells-bard.html character-wizard.html equipment-wizard.html spells-wizard.html character-paladin.html equipment-paladin.html spells-paladin.html)",
-      "Bash(do)"
+      "Bash(do)",
+      "Bash(for file in equipment-paladin.html equipment-rogue.html equipment-bard.html)",
+      "Bash(do grep -n \"async function loadInventoryData\" \"$file\")",
+      "Bash(for file in character-wizard.html character-paladin.html character-rogue.html character-bard.html)",
+      "Bash(do grep -n \"let characterName = '''';\" \"$file\")"
     ]
   }
 }

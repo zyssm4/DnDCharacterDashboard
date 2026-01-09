@@ -505,11 +505,16 @@
             charisma: 10,
             armorClass: 10,
             maxHP: 8,
-            currentHP: 8
+            currentHP: 8,
+            gold: 0,
+            silver: 0,
+            copper: 0
         };
 
         let characterName = '';
         let rogueArchetype = 'thief';
+        let savingThrowProficiencies = [];
+        let skillProficiencies = [];
 
         // Load character data on page load
         window.addEventListener('DOMContentLoaded', loadCharacter);
@@ -534,11 +539,18 @@
                         charisma: parseInt(char.charisma),
                         armorClass: parseInt(char.armor_class),
                         maxHP: parseInt(char.max_hp),
-                        currentHP: parseInt(char.current_hp)
+                        currentHP: parseInt(char.current_hp),
+                        gold: parseInt(char.gold || 0),
+                        silver: parseInt(char.silver || 0),
+                        copper: parseInt(char.copper || 0)
                     };
 
                     characterName = char.name;
                     rogueArchetype = char.rogue_archetype || 'thief'; // Default to first valid option
+
+                    // Load proficiencies
+                    savingThrowProficiencies = char.saving_throw_proficiencies || ['dexterity', 'intelligence'];
+                    skillProficiencies = char.skill_proficiencies || [];
 
                     // Update UI
                     document.getElementById('charName').value = characterName;
@@ -627,7 +639,12 @@
                     charisma: characterStats.charisma,
                     armor_class: characterStats.armorClass,
                     max_hp: characterStats.maxHP,
-                    current_hp: characterStats.currentHP
+                    current_hp: characterStats.currentHP,
+                    gold: characterStats.gold,
+                    silver: characterStats.silver,
+                    copper: characterStats.copper,
+                    saving_throw_proficiencies: savingThrowProficiencies,
+                    skill_proficiencies: skillProficiencies
                 };
 
                 const response = await fetch(`${API_URL}?action=update_character`, {
