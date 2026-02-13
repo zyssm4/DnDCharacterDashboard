@@ -1066,12 +1066,12 @@
             Druiden Dashboard
         </h1>
         <div class="nav-menu">
-            <a href="class-selection.html" class="nav-item">🏠 Zur Klassenauswahl</a>
-            <a href="dashboard.html" class="nav-item">Dashboard</a>
-            <a href="character.html" class="nav-item">Charakter bearbeiten</a>
-            <a href="spells.html" class="nav-item">Zauber verwalten</a>
+            <a href="dashboard.html" class="nav-item">📊 Dashboard</a>
+            <a href="character.html" class="nav-item">👤 Charakter</a>
+            <a href="spells.html" class="nav-item">✨ Zauber</a>
             <a href="wildshape.html" class="nav-item">🐺 Wildgestalt</a>
-            <a href="equipment.html" class="nav-item">Ausrüstung</a>
+            <a href="equipment.html" class="nav-item">⚔️ Ausrüstung</a>
+            <a href="class-selection.html" class="nav-item">🎲 Klassenauswahl</a>
         </div>
     </div>
 
@@ -1883,7 +1883,8 @@
             let html = '';
             slots.forEach((count, index) => {
                 const slotLevel = index + 1;
-                const circles = spellSlots[slotLevel] || Array(count).fill(false);
+                const saved = spellSlots[slotLevel] || [];
+                const circles = Array(count).fill(false).map((_, i) => saved[i] || false);
 
                 html += `
                     <div class="slot-compact">
@@ -1927,15 +1928,41 @@
                 return;
             }
 
-            let html = '';
+            // Group spells by level
+            const spellsByLevel = {};
             prepared.forEach(spell => {
-                const schoolName = spell.school_de || spell.school || '';
+                const level = spell.level;
+                if (!spellsByLevel[level]) {
+                    spellsByLevel[level] = [];
+                }
+                spellsByLevel[level].push(spell);
+            });
+
+            // Render grouped spells
+            let html = '';
+            Object.keys(spellsByLevel).sort((a, b) => parseInt(a) - parseInt(b)).forEach(level => {
+                const levelName = level == 1 ? '1. Grad' : level == 2 ? '2. Grad' : level == 3 ? '3. Grad' :
+                                 level == 4 ? '4. Grad' : level == 5 ? '5. Grad' : level == 6 ? '6. Grad' :
+                                 level == 7 ? '7. Grad' : level == 8 ? '8. Grad' : '9. Grad';
+
                 html += `
-                    <div class="spell-compact" onclick="showSpellDetails(${spell.id})" title="Klicken für Details">
-                        <div class="name">${spell.name_de}</div>
-                        <div class="level">Stufe ${spell.level} - ${schoolName}</div>
-                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="color: #a5d6a7; font-size: 14px; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(165, 214, 167, 0.3);">
+                            ${levelName}
+                        </h3>
                 `;
+
+                spellsByLevel[level].forEach(spell => {
+                    const schoolName = spell.school_de || spell.school || '';
+                    html += `
+                        <div class="spell-compact" onclick="showSpellDetails(${spell.id})" title="Klicken für Details">
+                            <div class="name">${spell.name_de}</div>
+                            <div class="level">${schoolName}</div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
             });
 
             container.innerHTML = html;

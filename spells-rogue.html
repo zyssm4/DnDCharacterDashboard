@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zauber - Schurken Tracker</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+    <link rel="stylesheet" href="assets/css/shared-styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #9c27b0 0%, #6a1b9a 100%);
+            color: #f3e5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #ce93d8;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: rgba(165, 214, 167, 0.2);
+            color: #bbdefb;
+        }
+
+        nav a.active {
+            background: #ba68c8;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #bbdefb;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .info-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .info-box {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #ce93d8;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #bbdefb;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .filter-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            color: #bbdefb;
+        }
+
+        select, input[type="text"] {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 2px solid #ba68c8;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e3f2fd;
+            font-size: 14px;
+        }
+
+        .level-tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .level-tab {
+            padding: 10px 20px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #ba68c8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .level-tab:hover {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .level-tab.active {
+            background: #ba68c8;
+            color: white;
+        }
+
+        .spells-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .spell-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #ba68c8;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .spell-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .spell-card.prepared {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: #ce93d8;
+        }
+
+        .spell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .spell-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #bbdefb;
+        }
+
+        .spell-level {
+            background: #ba68c8;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .spell-school {
+            color: #ce93d8;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .spell-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .spell-detail {
+            color: #bbdefb;
+        }
+
+        .spell-detail strong {
+            color: #ce93d8;
+        }
+
+        .spell-description {
+            color: #bbdefb;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .spell-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .prepare-btn {
+            padding: 6px 12px;
+            background: #ba68c8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .prepare-btn:hover {
+            background: #45a049;
+        }
+
+        .prepare-btn.prepared {
+            background: #e57373;
+        }
+
+        .prepare-btn.prepared:hover {
+            background: #ef5350;
+        }
+
+        .prepared-badge {
+            background: #ba68c8;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .cantrip-badge {
+            background: #7e57c2;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .component-warning {
+            position: relative;
+            display: inline-block;
+            margin-left: 8px;
+            color: #ff9800;
+            font-size: 18px;
+            cursor: help;
+        }
+
+        .component-warning-tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 1000;
+            background: rgba(255, 87, 34, 0.98);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 2px solid #ff9800;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            width: 220px;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .component-warning:hover .component-warning-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .component-warning-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #ff9800 transparent transparent transparent;
+        }
+
+        .missing-component {
+            display: block;
+            margin: 2px 0;
+        }
+
+        .save-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .btn-save {
+            padding: 12px 32px;
+            background: #ba68c8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            padding: 12px 32px;
+            background: #757575;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: 15px;
+        }
+
+        .btn-back:hover {
+            background: #616161;
+        }
+
+        .save-indicator {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .save-indicator.success {
+            background: rgba(76, 175, 80, 0.3);
+            color: #bbdefb;
+            display: block;
+        }
+
+        .save-indicator.error {
+            background: rgba(229, 115, 115, 0.3);
+            color: #ffcdd2;
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #ce93d8;
+            font-size: 18px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #f44336; }
+        .notification.warning { background: #ff9800; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+            }
+
+            .info-section {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .info-box {
+                flex: 1 1 45%;
+            }
+
+            .info-label {
+                font-size: 12px;
+            }
+
+            .info-value {
+                font-size: 20px;
+            }
+
+            .spells-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .filter-group input,
+            .filter-group select {
+                width: 100%;
+            }
+
+            .level-tabs {
+                justify-content: flex-start;
+                padding: 10px;
+            }
+
+            .level-tab {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            .spell-card {
+                padding: 12px;
+            }
+
+            .spell-details {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .btn-save, .btn-back {
+                font-size: 16px;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .info-section {
+                flex-direction: column;
+            }
+
+            .info-box {
+                width: 100%;
+            }
+
+            .level-tabs {
+                gap: 5px;
+            }
+
+            .btn-save, .btn-back {
+                display: block;
+                width: 100%;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;"></div>
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <nav>
+        <a href="dashboard-rogue.html">📊 Dashboard</a>
+        <a href="character-rogue.html">👤 Charakter</a>
+        <a href="spells-rogue.html" class="active">✨ Zauber</a>
+        <a href="equipment-rogue.html">⚔️ Ausrüstung</a>
+        <a href="class-selection.html">🎲 Klassenauswahl</a>
+    </nav>
+
+    <div class="container">
+        <h1>Zauber verwalten</h1>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <div class="info-box">
+                <div class="info-label">Charakterstufe</div>
+                <div class="info-value" id="charLevel">1</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Vorbereitete Zauber</div>
+                <div class="info-value" id="preparedCount">0</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Max. vorbereitet</div>
+                <div class="info-value" id="maxPrepared">1</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Max. Zauberstufe</div>
+                <div class="info-value" id="maxSpellLevel">1</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Suche:</label>
+                <input type="text" id="searchInput" placeholder="Zaubername..." oninput="filterSpells()">
+            </div>
+            <div class="filter-group">
+                <label>Schule:</label>
+                <select id="schoolFilter" onchange="filterSpells()">
+                    <option value="">Alle</option>
+                    <option value="Bannzauber">Bannzauber</option>
+                    <option value="Beschwörung">Beschwörung</option>
+                    <option value="Erkenntniszauber">Erkenntniszauber</option>
+                    <option value="Hervorrufung">Hervorrufung</option>
+                    <option value="Illusionszauber">Illusionszauber</option>
+                    <option value="Nekromantie">Nekromantie</option>
+                    <option value="Verzauberung">Verzauberung</option>
+                    <option value="Verwandlung">Verwandlung</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Anzeigen:</label>
+                <select id="statusFilter" onchange="filterSpells()">
+                    <option value="all">Alle Zauber</option>
+                    <option value="prepared">Nur vorbereitete</option>
+                    <option value="unprepared">Nur unvorbereitete</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Level Tabs -->
+        <div class="level-tabs" id="levelTabs"></div>
+
+        <!-- Spells Grid -->
+        <div class="spells-grid" id="spellsGrid"></div>
+
+        <!-- Save Section -->
+        <div class="save-section">
+            <button class="btn-save" onclick="savePreparedSpells()">Änderungen speichern</button>
+            <button class="btn-back" onclick="goBack()">Zurück zum Dashboard</button>
+            <div class="save-indicator" id="saveIndicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'db_actions.php';
+        const CHARACTER_ID = new URLSearchParams(window.location.search).get('id') || 1;
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        let allSpells = [];
+        let preparedSpells = [];
+        let characterLevel = 1;
+        let characterIntelligence = 10;
+        let rogueArchetype = '';
+        let currentLevelFilter = null;
+        let inventory = [];
+        let characterGold = 0;
+
+        // Spell level progression for Arcane Trickster rogues
+        const maxSpellLevelByCharLevel = {
+            1: 0, 2: 0, 3: 1, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2, 9: 2,
+            10: 2, 11: 2, 12: 2, 13: 3, 14: 3, 15: 3, 16: 3, 17: 3, 18: 3, 19: 4, 20: 4
+        };
+
+        window.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            try {
+                showLoading();
+                await loadCharacter();
+                await loadInventory();
+                await loadSpells();
+                renderLevelTabs();
+                filterSpells();
+                updatePreparedCount();
+            } catch (error) {
+                console.error('Error initializing:', error);
+                showNotification('Fehler beim Initialisieren', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadCharacter() {
+            try {
+                const response = await fetch(`${API_URL}?action=character&id=${CHARACTER_ID}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const char = data.data;
+                    characterLevel = parseInt(char.level);
+                    characterIntelligence = parseInt(char.intelligence);
+                    rogueArchetype = char.rogue_archetype || '';
+                    preparedSpells = char.prepared_spells || [];
+                    characterGold = parseFloat(char.gold || 0);
+
+                    // Check if this is an Arcane Trickster
+                    if (rogueArchetype !== 'arcane_trickster') {
+                        // Show message that only Arcane Trickster rogues have spells
+                        document.querySelector('.container').innerHTML = `
+                            <h1>Zauber verwalten</h1>
+                            <div style="background: rgba(0, 0, 0, 0.3); border-radius: 15px; padding: 40px; text-align: center; margin-top: 50px;">
+                                <h2 style="color: #ce93d8; margin-bottom: 20px;">⚠️ Keine Zauber verfügbar</h2>
+                                <p style="font-size: 18px; color: #f3e5f5; margin-bottom: 15px;">
+                                    Nur Schurken mit dem <strong>Arcane Trickster</strong> Archetyp haben Zugriff auf Zauber.
+                                </p>
+                                <p style="font-size: 16px; color: #ce93d8;">
+                                    Dein aktueller Archetyp: <strong>${rogueArchetype || 'Nicht festgelegt'}</strong>
+                                </p>
+                                <p style="font-size: 14px; color: #ba68c8; margin-top: 20px;">
+                                    Ändere deinen Archetyp in den Charaktereinstellungen, um Zugriff auf Zauber zu erhalten.
+                                </p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Update info display for Arcane Trickster
+                    document.getElementById('charLevel').textContent = characterLevel;
+                    // Arcane Tricksters know a limited number of spells (not prepared like wizards)
+                    const maxKnownSpells = characterLevel < 3 ? 0 : 3 + Math.floor((characterLevel - 3) / 2);
+                    document.getElementById('maxPrepared').textContent = maxKnownSpells + ' bekannte';
+                    document.getElementById('maxSpellLevel').textContent = maxSpellLevelByCharLevel[characterLevel];
+                } else {
+                    throw new Error(data.error || 'Charakter konnte nicht geladen werden');
+                }
+            } catch (error) {
+                console.error('Error loading character:', error);
+                showNotification(error.message || 'Fehler beim Laden des Charakters', 'error');
+            }
+        }
+
+        async function loadInventory() {
+            try {
+                const response = await fetch(`${API_URL}?action=inventory&char_id=${CHARACTER_ID}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    inventory = data.data.inventory || [];
+                } else {
+                    console.warn('Inventar konnte nicht geladen werden:', data.error);
+                    inventory = [];
+                }
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                inventory = [];
+            }
+        }
+
+        async function loadSpells() {
+            try {
+                const maxSpellLevel = maxSpellLevelByCharLevel[characterLevel];
+                const response = await fetch(`${API_URL}?action=spells&max_spell_level=${maxSpellLevel}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allSpells = data.data;
+                } else {
+                    throw new Error(data.error || 'Zauber konnten nicht geladen werden');
+                }
+            } catch (error) {
+                console.error('Error loading spells:', error);
+                showNotification(error.message || 'Fehler beim Laden der Zauber', 'error');
+            }
+        }
+
+        function renderLevelTabs() {
+            const tabsContainer = document.getElementById('levelTabs');
+            const maxLevel = maxSpellLevelByCharLevel[characterLevel];
+
+            let tabsHTML = '<div class="level-tab" onclick="setLevelFilter(null)">Alle</div>';
+            tabsHTML += '<div class="level-tab" onclick="setLevelFilter(0)">Zaubertricks</div>';
+
+            for (let i = 1; i <= maxLevel; i++) {
+                tabsHTML += `<div class="level-tab" onclick="setLevelFilter(${i})">Stufe ${i}</div>`;
+            }
+
+            tabsContainer.innerHTML = tabsHTML;
+        }
+
+        function setLevelFilter(level) {
+            currentLevelFilter = level;
+
+            // Update active tab
+            const tabs = document.querySelectorAll('.level-tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.remove('active');
+                if ((level === null && index === 0) ||
+                    (level === 0 && index === 1) ||
+                    (level !== null && level !== 0 && index === level + 1)) {
+                    tab.classList.add('active');
+                }
+            });
+
+            filterSpells();
+        }
+
+        function filterSpells() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const schoolFilter = document.getElementById('schoolFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            let filtered = allSpells.filter(spell => {
+                // Level filter
+                if (currentLevelFilter !== null && spell.level !== currentLevelFilter) {
+                    return false;
+                }
+
+                // Search filter
+                if (searchTerm && !spell.name_de.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                // School filter
+                if (schoolFilter && spell.school_de !== schoolFilter) {
+                    return false;
+                }
+
+                // Status filter
+                const isPrepared = preparedSpells.includes(spell.id);
+                if (statusFilter === 'prepared' && !isPrepared) {
+                    return false;
+                }
+                if (statusFilter === 'unprepared' && isPrepared) {
+                    return false;
+                }
+
+                return true;
+            });
+
+            renderSpells(filtered);
+        }
+
+        function checkMaterialComponents(spell) {
+            if (!spell.components || !spell.components.includes('M')) {
+                return null; // No material components required
+            }
+
+            if (!spell.material_de && !spell.material) {
+                return null; // No specific materials listed
+            }
+
+            const materialText = spell.material_de || spell.material || '';
+            const missingComponents = [];
+
+            // Check for GP cost in material text
+            const gpMatch = materialText.match(/(\d+)\s*(GP|gp|Goldstücke?)/i);
+            if (gpMatch) {
+                const requiredGold = parseInt(gpMatch[1]);
+                if (characterGold < requiredGold) {
+                    missingComponents.push(`${requiredGold} GP (du hast ${characterGold} GP)`);
+                }
+            }
+
+            // Check if specific material components are in inventory
+            // Extract component names (simplified check for common patterns)
+            const componentKeywords = [
+                'Diamant', 'Rubin', 'Smaragd', 'Saphir', 'Perle', 'Jade',
+                'Weihrauch', 'Schwefel', 'Phosphor', 'Fledermausguano',
+                'Holzkohle', 'Salz', 'Eisen', 'Silber', 'Gold', 'Kupfer',
+                'Kristall', 'Glasperle', 'Bernstein', 'Knochen', 'Haar',
+                'Feder', 'Leder', 'Seide', 'Samt', 'Wolle'
+            ];
+
+            for (const keyword of componentKeywords) {
+                if (materialText.includes(keyword)) {
+                    const hasComponent = inventory.some(item =>
+                        item.name && item.name.toLowerCase().includes(keyword.toLowerCase())
+                    );
+                    if (!hasComponent) {
+                        missingComponents.push(keyword);
+                    }
+                }
+            }
+
+            return missingComponents.length > 0 ? missingComponents : null;
+        }
+
+        function renderSpells(spells) {
+            const grid = document.getElementById('spellsGrid');
+
+            if (spells.length === 0) {
+                grid.innerHTML = '<div class="empty-state">Keine Zauber gefunden</div>';
+                return;
+            }
+
+            grid.innerHTML = spells.map(spell => {
+                const isPrepared = preparedSpells.includes(spell.id);
+                const isCantrip = spell.level === 0;
+                const missingComponents = checkMaterialComponents(spell);
+
+                return `
+                    <div class="spell-card ${isPrepared ? 'prepared' : ''}" data-spell-id="${spell.id}">
+                        <div class="spell-header">
+                            <div class="spell-name">
+                                ${spell.name_de}
+                                ${missingComponents ? `
+                                    <span class="component-warning">
+                                        ⚠️
+                                        <div class="component-warning-tooltip">
+                                            <strong>Fehlende Komponenten:</strong>
+                                            ${missingComponents.map(c => `<span class="missing-component">• ${c}</span>`).join('')}
+                                        </div>
+                                    </span>
+                                ` : ''}
+                            </div>
+                            <div class="spell-level">${isCantrip ? 'Zaubertrick' : `Stufe ${spell.level}`}</div>
+                        </div>
+                        <div class="spell-school">${spell.school_de || 'Unbekannt'}</div>
+                        <div class="spell-details">
+                            <div class="spell-detail"><strong>Zeitaufwand:</strong> ${spell.casting_time_de || 'N/A'}</div>
+                            <div class="spell-detail"><strong>Reichweite:</strong> ${spell.range_de || 'N/A'}</div>
+                            <div class="spell-detail"><strong>Komponenten:</strong> ${spell.components || 'N/A'}</div>
+                            <div class="spell-detail"><strong>Dauer:</strong> ${spell.duration_de || 'N/A'}</div>
+                        </div>
+                        <div class="spell-description">${spell.description_de || 'Keine Beschreibung verfügbar'}</div>
+                        <div class="spell-status">
+                            ${isPrepared
+                                ? `<span class="prepared-badge">✓ ${isCantrip ? 'Ausgewählt' : 'Vorbereitet'}</span>`
+                                : '<span></span>'
+                            }
+                            <button class="prepare-btn ${isPrepared ? 'prepared' : ''}" onclick="togglePrepare(${spell.id}, event)">
+                                ${isPrepared ? 'Entfernen' : (isCantrip ? 'Auswählen' : 'Vorbereiten')}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function togglePrepare(spellId, event) {
+            event.stopPropagation();
+
+            const index = preparedSpells.indexOf(spellId);
+            const spell = allSpells.find(s => s.id === spellId);
+            const isCantrip = spell.level === 0;
+
+            if (index > -1) {
+                // Remove from prepared
+                preparedSpells.splice(index, 1);
+            } else {
+                // For cantrips: Check max cantrips (based on level)
+                if (isCantrip) {
+                    const cantripsByLevel = {
+                        1: 2, 2: 2, 3: 2, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3,
+                        10: 4, 11: 4, 12: 4, 13: 4, 14: 4, 15: 4, 16: 4, 17: 4, 18: 4, 19: 4, 20: 4
+                    };
+                    const maxCantrips = cantripsByLevel[characterLevel] || 2;
+                    const preparedCantrips = preparedSpells.filter(id => {
+                        const s = allSpells.find(spell => spell.id === id);
+                        return s && s.level === 0;
+                    }).length;
+
+                    if (preparedCantrips >= maxCantrips) {
+                        alert(`Du kannst maximal ${maxCantrips} Zaubertricks auswählen (basierend auf Stufe ${characterLevel}).`);
+                        return;
+                    }
+                } else {
+                    // For regular spells: Check max prepared spells
+                    const maxPrepared = Math.max(1, characterLevel + Math.floor((characterWisdom - 10) / 2));
+                    const preparedNonCantrips = preparedSpells.filter(id => {
+                        const s = allSpells.find(spell => spell.id === id);
+                        return s && s.level > 0;
+                    }).length;
+
+                    if (preparedNonCantrips >= maxPrepared) {
+                        alert(`Du kannst maximal ${maxPrepared} Zauber vorbereiten (basierend auf Stufe und Weisheit).`);
+                        return;
+                    }
+                }
+
+                // Add to prepared
+                preparedSpells.push(spellId);
+            }
+
+            updatePreparedCount();
+            filterSpells();
+        }
+
+        function updatePreparedCount() {
+            const preparedNonCantrips = preparedSpells.filter(id => {
+                const spell = allSpells.find(s => s.id === id);
+                return spell && spell.level > 0;
+            }).length;
+
+            document.getElementById('preparedCount').textContent = preparedNonCantrips;
+        }
+
+        async function savePreparedSpells() {
+            try {
+                showLoading();
+                const response = await fetch(`${API_URL}?action=update_prepared_spells`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        char_id: CHARACTER_ID,
+                        prepared_spells: preparedSpells
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('Zauber erfolgreich gespeichert!');
+                } else {
+                    throw new Error(data.error || 'Fehler beim Speichern');
+                }
+            } catch (error) {
+                console.error('Error saving spells:', error);
+                showNotification(error.message || 'Fehler beim Speichern', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showSaveIndicator(message, type) {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.textContent = message;
+            indicator.className = `save-indicator ${type}`;
+
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 3000);
+        }
+
+        function goBack() {
+            window.location.href = 'dashboard-wizard.html';
+        }
+
+        // Set "Alle" tab as active by default
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const firstTab = document.querySelector('.level-tab');
+                if (firstTab) firstTab.classList.add('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

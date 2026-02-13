@@ -867,6 +867,36 @@
             }
         });
 
+        // Normalize item properties from database format to consistent format
+        function normalizeItemProperties(item) {
+            if (!item) return item;
+
+            // If item has a properties JSON string, parse it
+            if (item.properties) {
+                try {
+                    const props = typeof item.properties === 'string'
+                        ? JSON.parse(item.properties)
+                        : item.properties;
+
+                    // Map database properties to item fields
+                    if (props.armor_type) item.armor_type = props.armor_type;
+                    if (props.finesse) item.finesse = props.finesse;
+                    if (props.ranged) item.ranged = props.ranged;
+                    if (props.light) item.light = props.light;
+                    if (props.weapon_type) item.weapon_type = props.weapon_type;
+                } catch (e) {
+                    console.warn('Could not parse item properties:', e);
+                }
+            }
+
+            // Normalize AC field names
+            if (item.armor_class && !item.ac) {
+                item.ac = item.armor_class;
+            }
+
+            return item;
+        }
+
         async function loadInventoryData() {
             try {
                 showLoading();
@@ -893,6 +923,16 @@
                         armor: null,
                         magic: null
                     };
+
+                    // Normalize all inventory items
+                    inventory = inventory.map(normalizeItemProperties);
+
+                    // Normalize equipped items
+                    Object.keys(equippedItems).forEach(slot => {
+                        if (equippedItems[slot]) {
+                            equippedItems[slot] = normalizeItemProperties(equippedItems[slot]);
+                        }
+                    });
 
                     console.log('Inventory items:', inventory);
                     console.log('Equipped items:', equippedItems);
@@ -1304,15 +1344,12 @@
                 let calculatedAC = 10;
                 const dexMod = calculateModifier(characterStats.dexterity);
 
-                // Parse armor properties if armor is equipped
+                // Check if armor is equipped (armor is already normalized)
                 const armor = equippedItems.armor;
-                if (armor && armor.properties) {
-                    const props = typeof armor.properties === 'string'
-                        ? JSON.parse(armor.properties)
-                        : armor.properties;
-
-                    const armorType = props.armor_type; // 'light', 'medium', 'heavy'
-                    const armorAC = armor.armor_class || armor.ac || 10;
+                if (armor) {
+                    // Use normalized armor_type field
+                    const armorType = armor.armor_type; // 'light', 'medium', 'heavy'
+                    const armorAC = armor.ac || armor.armor_class || 10;
 
                     if (armorType === 'light') {
                         // Light armor: AC + full DEX modifier
@@ -1324,7 +1361,7 @@
                         // Heavy armor: AC only (no DEX)
                         calculatedAC = armorAC;
                     } else {
-                        // Fallback
+                        // Fallback for armor without type: assume light armor
                         calculatedAC = armorAC + dexMod;
                     }
                 } else {
@@ -1335,11 +1372,11 @@
                 // Add shield bonus
                 const shield = equippedItems.offhand;
                 if (shield && shield.type === 'shield') {
-                    const shieldBonus = shield.armor_class || shield.ac_bonus || 2;
+                    const shieldBonus = shield.ac_bonus || shield.armor_class || shield.ac || 2;
                     calculatedAC += shieldBonus;
                 }
 
-                console.log(`AC Calculation: Base=${armor ? armor.armor_class || armor.ac : 10}, DEX Mod=${dexMod}, Shield=${shield ? (shield.armor_class || shield.ac_bonus || 2) : 0}, Total=${calculatedAC}`);
+                console.log(`AC Calculation: Base=${armor ? armor.ac || armor.armor_class : 10}, DEX Mod=${dexMod}, Shield=${shield ? (shield.ac_bonus || 2) : 0}, Total=${calculatedAC}`);
 
                 // Update character AC in database
                 const response = await fetch(`${API_URL}?action=update_character_ac`, {

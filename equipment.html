@@ -923,6 +923,36 @@
             }
         });
 
+        // Normalize item properties from database format to consistent format
+        function normalizeItemProperties(item) {
+            if (!item) return item;
+
+            // If item has a properties JSON string, parse it
+            if (item.properties) {
+                try {
+                    const props = typeof item.properties === 'string'
+                        ? JSON.parse(item.properties)
+                        : item.properties;
+
+                    // Map database properties to item fields
+                    if (props.armor_type) item.armor_type = props.armor_type;
+                    if (props.finesse) item.finesse = props.finesse;
+                    if (props.ranged) item.ranged = props.ranged;
+                    if (props.light) item.light = props.light;
+                    if (props.weapon_type) item.weapon_type = props.weapon_type;
+                } catch (e) {
+                    console.warn('Could not parse item properties:', e);
+                }
+            }
+
+            // Normalize AC field names
+            if (item.armor_class && !item.ac) {
+                item.ac = item.armor_class;
+            }
+
+            return item;
+        }
+
         async function loadInventoryData() {
             try {
                 showLoading();
@@ -949,6 +979,16 @@
                         armor: null,
                         magic: null
                     };
+
+                    // Normalize all inventory items
+                    inventory = inventory.map(normalizeItemProperties);
+
+                    // Normalize equipped items
+                    Object.keys(equippedItems).forEach(slot => {
+                        if (equippedItems[slot]) {
+                            equippedItems[slot] = normalizeItemProperties(equippedItems[slot]);
+                        }
+                    });
 
                     console.log('Inventory items:', inventory);
                     console.log('Equipped items:', equippedItems);
@@ -1135,10 +1175,44 @@
                 searchResults.innerHTML = '<div class="search-loading">Suche...</div>';
                 searchResults.classList.add('active');
 
-                const response = await fetch(`${API_URL}?action=equipment&search=${encodeURIComponent(searchTerm)}`);
-                const data = await response.json();
+                const url = `${API_URL}?action=equipment&search=${encodeURIComponent(searchTerm)}`;
+                console.log('Searching equipment with URL:', url);
 
-                if (data.success && data.data.length > 0) {
+                const response = await fetch(url);
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+
+                // Check for HTTP errors
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP Error Response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    console.error('Response was:', responseText);
+                    throw new Error('Invalid JSON response from server');
+                }
+
+                console.log('Parsed data:', data);
+
+                // Check if API returned an error
+                if (!data.success) {
+                    searchResults.innerHTML = `<div class="search-error" style="color: #ef5350; padding: 10px;">
+                        ⚠️ Fehler beim Laden der Ausrüstung: ${data.error || 'Unbekannter Fehler'}
+                    </div>`;
+                    return;
+                }
+
+                // Check if we have results
+                if (data.data && data.data.length > 0) {
                     searchResults.innerHTML = data.data.map(item => {
                         let details = getTypeLabel(item.type);
 
@@ -1165,11 +1239,15 @@
                         `;
                     }).join('');
                 } else {
-                    searchResults.innerHTML = '<div class="search-loading">Keine Ergebnisse gefunden</div>';
+                    // No results found (but query was successful)
+                    searchResults.innerHTML = '<div class="search-loading" style="color: #90caf9;">📦 Keine Ergebnisse gefunden</div>';
                 }
             } catch (error) {
                 console.error('Error searching database:', error);
-                searchResults.innerHTML = '<div class="search-loading">Fehler bei der Suche</div>';
+                // Network or other error
+                searchResults.innerHTML = `<div class="search-error" style="color: #ef5350; padding: 10px;">
+                    ❌ Datenbankverbindung fehlgeschlagen. Bitte später versuchen.
+                </div>`;
             }
         }
 
@@ -1184,7 +1262,9 @@
                 type: dbItem.type,
                 description: dbItem.description_de || '',
                 weight: parseFloat(dbItem.weight_lbs) || 1,
-                quantity: isStackable(dbItem.type) ? 1 : undefined
+                quantity: isStackable(dbItem.type) ? 1 : undefined,
+                properties: dbItem.properties, // Keep original properties
+                armor_class: dbItem.armor_class // Keep original armor_class field
             };
 
             // Add weapon-specific fields
@@ -1221,6 +1301,7 @@
                     console.warn('Could not parse properties:', e);
                 }
 
+                newItem.armor_type = properties.armor_type; // Store armor_type directly
                 newItem.ac_type = properties.armor_type === 'light' ? 'dex' :
                                  properties.armor_type === 'medium' ? 'dex_max2' : 'fixed';
                 newItem.stealth_disadvantage = properties.stealth_disadvantage || false;
@@ -1231,8 +1312,11 @@
                 newItem.ac_bonus = parseInt(dbItem.armor_class) || 2;
             }
 
+            // Normalize the item before adding to inventory
+            const normalizedItem = normalizeItemProperties(newItem);
+
             // Add to inventory
-            inventory.push(newItem);
+            inventory.push(normalizedItem);
 
             // Save and render
             saveInventory();
@@ -1382,15 +1466,12 @@
                 let calculatedAC = 10;
                 const dexMod = calculateModifier(characterStats.dexterity);
 
-                // Parse armor properties if armor is equipped
+                // Check if armor is equipped (armor is already normalized)
                 const armor = equippedItems.armor;
-                if (armor && armor.properties) {
-                    const props = typeof armor.properties === 'string'
-                        ? JSON.parse(armor.properties)
-                        : armor.properties;
-
-                    const armorType = props.armor_type; // 'light', 'medium', 'heavy'
-                    const armorAC = armor.armor_class || armor.ac || 10;
+                if (armor) {
+                    // Use normalized armor_type field
+                    const armorType = armor.armor_type; // 'light', 'medium', 'heavy'
+                    const armorAC = armor.ac || armor.armor_class || 10;
 
                     if (armorType === 'light') {
                         // Light armor: AC + full DEX modifier
@@ -1402,7 +1483,7 @@
                         // Heavy armor: AC only (no DEX)
                         calculatedAC = armorAC;
                     } else {
-                        // Fallback
+                        // Fallback for armor without type: assume light armor
                         calculatedAC = armorAC + dexMod;
                     }
                 } else {
@@ -1413,11 +1494,11 @@
                 // Add shield bonus
                 const shield = equippedItems.offhand;
                 if (shield && shield.type === 'shield') {
-                    const shieldBonus = shield.armor_class || shield.ac_bonus || 2;
+                    const shieldBonus = shield.ac_bonus || shield.armor_class || shield.ac || 2;
                     calculatedAC += shieldBonus;
                 }
 
-                console.log(`AC Calculation: Base=${armor ? armor.armor_class || armor.ac : 10}, DEX Mod=${dexMod}, Shield=${shield ? (shield.armor_class || shield.ac_bonus || 2) : 0}, Total=${calculatedAC}`);
+                console.log(`AC Calculation: Base=${armor ? armor.ac || armor.armor_class : 10}, DEX Mod=${dexMod}, Shield=${shield ? (shield.ac_bonus || 2) : 0}, Total=${calculatedAC}`);
 
                 // Update character AC in database
                 const response = await fetch(`${API_URL}?action=update_character_ac`, {

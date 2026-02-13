@@ -861,3 +861,246 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ============================================
+   Standardized Button Styles
+   ============================================ */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* Button Variants */
+.btn-primary {
+    background: var(--btn-primary, #42a5f5);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--btn-primary-hover, #64b5f6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-success {
+    background: var(--btn-success, #66bb6a);
+    color: white;
+}
+
+.btn-success:hover {
+    background: var(--btn-success-hover, #81c784);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-danger {
+    background: var(--btn-danger, #ef5350);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--btn-danger-hover, #f44336);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-warning {
+    background: var(--btn-warning, #ffa726);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: var(--btn-warning-hover, #fb8c00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Button States */
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn:disabled:hover {
+    transform: none !important;
+}
+
+/* Button Sizes */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+.btn-block {
+    width: 100%;
+    display: block;
+}
+
+/* ============================================
+   Enhanced Mobile Responsive Design
+   ============================================ */
+
+/* Mobile First - Base Styles */
+.container {
+    max-width: 100%;
+    padding: 10px;
+    margin: 0 auto;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+        padding: 20px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 900px;
+    }
+}
+
+/* Wide Desktop */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Responsive Grids */
+.spell-grid,
+.equipment-grid,
+.beast-grid,
+.item-grid {
+    display: grid;
+    gap: 15px;
+    /* Mobile: 1 column */
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .spell-grid,
+    .equipment-grid,
+    .beast-grid,
+    .item-grid {
+        /* Tablet: 2 columns */
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .spell-grid,
+    .equipment-grid,
+    .beast-grid,
+    .item-grid {
+        /* Desktop: 3 columns */
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Touch Targets - Minimum 44px for accessibility */
+.btn,
+.nav-item,
+.badge,
+.stat-button,
+.spell-compact,
+.equipment-item {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Responsive Navigation */
+.navbar,
+.nav-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .navbar,
+    .nav-menu {
+        flex-direction: column;
+    }
+
+    .nav-item {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* Hide/Show Elements Based on Screen Size */
+.mobile-only {
+    display: block;
+}
+
+.desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .mobile-only {
+        display: none;
+    }
+
+    .desktop-only {
+        display: block;
+    }
+}
+
+/* Responsive Text Sizes */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Improved Form Inputs on Mobile */
+@media (max-width: 768px) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    select,
+    textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        width: 100%;
+    }
+}

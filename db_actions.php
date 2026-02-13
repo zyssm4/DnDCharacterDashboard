@@ -8,7 +8,13 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Include database configuration and connection
-require_once __DIR__ . '/ConfigFile/dbconfig.php';
+try {
+    require_once __DIR__ . '/ConfigFile/dbconfig.php';
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Datenbankverbindung fehlgeschlagen: ' . $e->getMessage()]);
+    exit;
+}
 
 // Get request method and action
 $method = $_SERVER['REQUEST_METHOD'];
@@ -379,39 +385,44 @@ if ($method === 'GET') {
 
         // Get equipment/items
         case 'equipment':
-            $type = $_GET['type'] ?? null;
-            $search = $_GET['search'] ?? null;
+            try {
+                $type = $_GET['type'] ?? null;
+                $search = $_GET['search'] ?? null;
 
-            $query = "SELECT * FROM equipment";
-            $conditions = [];
-            $params = [];
+                $query = "SELECT * FROM equipment";
+                $conditions = [];
+                $params = [];
 
-            if ($type) {
-                $conditions[] = "type = :type";
-                $params[':type'] = $type;
+                if ($type) {
+                    $conditions[] = "type = :type";
+                    $params[':type'] = $type;
+                }
+
+                if ($search) {
+                    $conditions[] = "(name_de LIKE :search OR name_en LIKE :search OR description_de LIKE :search)";
+                    $params[':search'] = "%{$search}%";
+                }
+
+                if (!empty($conditions)) {
+                    $query .= " WHERE " . implode(' AND ', $conditions);
+                }
+
+                $query .= " ORDER BY name_de";
+
+                $stmt = $pdo->prepare($query);
+
+                foreach ($params as $key => $value) {
+                    $stmt->bindValue($key, $value);
+                }
+
+                $stmt->execute();
+                $equipment = $stmt->fetchAll();
+
+                echo json_encode(['success' => true, 'data' => $equipment]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => 'Datenbankfehler: ' . $e->getMessage()]);
             }
-
-            if ($search) {
-                $conditions[] = "(name_de LIKE :search OR name_en LIKE :search OR description_de LIKE :search)";
-                $params[':search'] = "%{$search}%";
-            }
-
-            if (!empty($conditions)) {
-                $query .= " WHERE " . implode(' AND ', $conditions);
-            }
-
-            $query .= " ORDER BY name_de";
-
-            $stmt = $pdo->prepare($query);
-
-            foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value);
-            }
-
-            $stmt->execute();
-            $equipment = $stmt->fetchAll();
-
-            echo json_encode(['success' => true, 'data' => $equipment]);
             break;
             
         // Get character inventory

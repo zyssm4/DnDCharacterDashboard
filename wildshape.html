@@ -629,7 +629,7 @@
 
         async function loadCharacter() {
             try {
-                const response = await fetch(`${API_URL}?action=character&class=druid`);
+                const response = await fetch(`${API_URL}?action=character&id=${CHARACTER_ID}`);
                 const result = await response.json();
 
                 if (result.success && result.data) {
@@ -741,7 +741,14 @@
                     if (parseFloat(beast.cr) !== cr) return false;
                 }
 
-                // Ability filters
+                // Check if form requires locked abilities
+                // Swimming unlocks at level 4
+                if (beast.requires_swimming && currentFilters.level < 4) return false;
+
+                // Flying unlocks at level 8
+                if (beast.requires_flying && currentFilters.level < 8) return false;
+
+                // Ability filters (only apply if ability is unlocked)
                 if (currentFilters.swim && !beast.requires_swimming) return false;
                 if (currentFilters.fly && !beast.requires_flying) return false;
 

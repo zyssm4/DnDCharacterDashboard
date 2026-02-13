@@ -1,0 +1,111 @@
+/* D&D Character Tracker - Theme Variables */
+/* Standardized color scheme for all classes */
+
+:root {
+    /* Primary Background Gradients */
+    --primary-bg-start: #42a5f5;
+    --primary-bg-end: #1976d2;
+    --primary-accent: #90caf9;
+
+    /* Card Backgrounds */
+    --card-bg: rgba(0, 0, 0, 0.3);
+    --card-bg-hover: rgba(0, 0, 0, 0.4);
+    --card-border: #42a5f5;
+
+    /* Text Colors */
+    --text-primary: #e3f2fd;
+    --text-secondary: #bbdefb;
+    --text-heading: #90caf9;
+    --text-muted: #64b5f6;
+
+    /* Button Colors */
+    --btn-primary: #42a5f5;
+    --btn-primary-hover: #64b5f6;
+    --btn-success: #66bb6a;
+    --btn-success-hover: #81c784;
+    --btn-danger: #ef5350;
+    --btn-danger-hover: #f44336;
+    --btn-warning: #ffa726;
+    --btn-warning-hover: #fb8c00;
+    --btn-hover-bg: rgba(165, 214, 167, 0.2);
+
+    /* Status Colors */
+    --color-success: #66bb6a;
+    --color-error: #ef5350;
+    --color-warning: #ffa726;
+    --color-info: #42a5f5;
+
+    /* Border & Shadow */
+    --border-color: rgba(66, 165, 245, 0.3);
+    --border-radius: 10px;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.4);
+
+    /* Spacing */
+    --spacing-xs: 5px;
+    --spacing-sm: 10px;
+    --spacing-md: 15px;
+    --spacing-lg: 20px;
+    --spacing-xl: 30px;
+
+    /* Typography */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-sm: 12px;
+    --font-size-base: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 24px;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Z-Index Layers */
+    --z-dropdown: 100;
+    --z-modal: 500;
+    --z-tooltip: 600;
+    --z-loading: 999;
+    --z-navbar: 1000;
+}
+
+/* Class-Specific Accent Colors (Optional Override) */
+/* Uncomment and customize per class if you want to keep class-specific theming */
+
+/*
+.druid-theme {
+    --primary-bg-start: #2d5016;
+    --primary-bg-end: #1a2f0a;
+    --primary-accent: #a5d6a7;
+    --card-border: #66bb6a;
+}
+
+.wizard-theme {
+    --primary-bg-start: #42a5f5;
+    --primary-bg-end: #1976d2;
+    --primary-accent: #90caf9;
+    --card-border: #42a5f5;
+}
+
+.paladin-theme {
+    --primary-bg-start: #ffd54f;
+    --primary-bg-end: #f57f17;
+    --primary-accent: #fff176;
+    --card-border: #ffeb3b;
+}
+
+.rogue-theme {
+    --primary-bg-start: #9c27b0;
+    --primary-bg-end: #6a1b9a;
+    --primary-accent: #ce93d8;
+    --card-border: #ba68c8;
+}
+
+.bard-theme {
+    --primary-bg-start: #ec407a;
+    --primary-bg-end: #c2185b;
+    --primary-accent: #f48fb1;
+    --card-border: #e91e63;
+}
+*/
