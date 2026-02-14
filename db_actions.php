@@ -341,9 +341,9 @@ if ($method === 'GET') {
             // Calculate max CR based on circle and level
             if ($circle === 'moon') {
                 if ($level >= 6) {
-                    $maxCR = floor($level / 2);
-                } else if ($level >= 2) {
                     $maxCR = floor($level / 3);
+                } else if ($level >= 2) {
+                    $maxCR = 1;
                 }
             } else {
                 if ($level >= 8) {

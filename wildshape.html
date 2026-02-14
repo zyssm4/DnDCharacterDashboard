@@ -526,6 +526,11 @@
         <h1>🐺 Wildgestalt - Tierformen</h1>
         <p class="subtitle">Wähle deine Tiergestalten basierend auf deinem Druiden-Level</p>
 
+        <!-- Circle Info -->
+        <div class="stats-summary" id="circleInfo" style="justify-content: center; font-size: 1.1em;">
+            <span style="color: #a5d6a7;">Lade Zirkel...</span>
+        </div>
+
         <!-- Stats Summary -->
         <div class="stats-summary">
             <div class="summary-item">
@@ -607,6 +612,9 @@
 
         let allBeasts = [];
         let favorites = JSON.parse(localStorage.getItem('wildshape_favorites') || '[]');
+        let druidCircle = 'land';
+        let maxCRForLevel = 0.25; // Will be recalculated based on circle + level
+
         let currentFilters = {
             level: 2,
             cr: 'all',
@@ -635,9 +643,15 @@
                 if (result.success && result.data) {
                     characterData = result.data;
                     const level = result.data.level || 2;
+                    druidCircle = result.data.druid_circle || 'land';
+
                     document.getElementById('levelFilter').value = level;
                     document.getElementById('druidLevel').textContent = level;
                     currentFilters.level = level;
+
+                    // Update circle display and max CR
+                    maxCRForLevel = calculateMaxCR(druidCircle, level);
+                    updateCircleDisplay(druidCircle, level);
 
                     // Update ability badge lock states
                     updateAbilityBadges(level);
@@ -680,6 +694,88 @@
                     currentFilters.fly = false;
                     filterAndDisplayBeasts();
                 }
+            }
+        }
+
+        const circleNames = {
+            'land': 'Zirkel des Landes',
+            'moon': 'Zirkel des Mondes',
+            'dreams': 'Zirkel der Träume',
+            'shepherd': 'Zirkel des Hirten',
+            'spores': 'Zirkel der Sporen',
+            'wildfire': 'Zirkel des Wildfeuers',
+            'stars': 'Zirkel der Sterne'
+        };
+
+        function calculateMaxCR(circle, level) {
+            if (circle === 'moon') {
+                // Circle of the Moon: CR 1 at level 2, then floor(level/3) from level 6+
+                if (level >= 6) {
+                    return Math.floor(level / 3);
+                } else if (level >= 2) {
+                    return 1;
+                }
+                return 0;
+            } else {
+                // All other circles: CR 1/4 at level 2, CR 1/2 at level 4, CR 1 at level 8
+                if (level >= 8) return 1;
+                if (level >= 4) return 0.5;
+                return 0.25;
+            }
+        }
+
+        function updateCircleDisplay(circle, level) {
+            const maxCR = calculateMaxCR(circle, level);
+            const circleInfoEl = document.getElementById('circleInfo');
+            if (circleInfoEl) {
+                const isMoon = circle === 'moon';
+                circleInfoEl.innerHTML = `
+                    <span style="font-weight: bold; color: ${isMoon ? '#ffa726' : '#a5d6a7'};">
+                        ${isMoon ? '🌙' : '🌿'} ${circleNames[circle] || circle}
+                    </span>
+                    <span style="margin-left: 10px; color: #c8e6c9;">
+                        Max CR: ${formatCR(maxCR)}
+                    </span>
+                `;
+            }
+
+            // Update CR filter dropdown to only show relevant options
+            updateCRFilterOptions(maxCR);
+        }
+
+        function updateCRFilterOptions(maxCR) {
+            const crFilter = document.getElementById('crFilter');
+            const allCRValues = [
+                { value: '0', label: 'CR 0', num: 0 },
+                { value: '0.125', label: 'CR 1/8', num: 0.125 },
+                { value: '0.25', label: 'CR 1/4', num: 0.25 },
+                { value: '0.5', label: 'CR 1/2', num: 0.5 },
+                { value: '1', label: 'CR 1', num: 1 },
+                { value: '2', label: 'CR 2', num: 2 },
+                { value: '3', label: 'CR 3', num: 3 },
+                { value: '4', label: 'CR 4', num: 4 },
+                { value: '5', label: 'CR 5', num: 5 },
+                { value: '6', label: 'CR 6', num: 6 }
+            ];
+
+            const currentValue = crFilter.value;
+            crFilter.innerHTML = '<option value="all">Alle CR</option>';
+
+            allCRValues.forEach(cr => {
+                if (cr.num <= maxCR) {
+                    const option = document.createElement('option');
+                    option.value = cr.value;
+                    option.textContent = cr.label;
+                    crFilter.appendChild(option);
+                }
+            });
+
+            // Restore selection if still valid, otherwise reset
+            if (currentValue !== 'all' && parseFloat(currentValue) <= maxCR) {
+                crFilter.value = currentValue;
+            } else if (currentValue !== 'all') {
+                crFilter.value = 'all';
+                currentFilters.cr = 'all';
             }
         }
 
@@ -731,11 +827,23 @@
         }
 
         function filterAndDisplayBeasts() {
-            let filtered = allBeasts.filter(beast => {
-                // Level filter
-                if (beast.min_level > currentFilters.level) return false;
+            // Recalculate max CR based on current circle and level
+            maxCRForLevel = calculateMaxCR(druidCircle, currentFilters.level);
 
-                // CR filter (for Moon Druids)
+            let filtered = allBeasts.filter(beast => {
+                const beastCR = parseFloat(beast.cr);
+
+                if (druidCircle === 'moon') {
+                    // Moon druids: availability is based purely on CR, not min_level
+                    // (min_level in DB reflects non-Moon rules)
+                    if (beastCR > maxCRForLevel) return false;
+                } else {
+                    // Other circles: use standard min_level from DB + CR cap
+                    if (beast.min_level > currentFilters.level) return false;
+                    if (beastCR > maxCRForLevel) return false;
+                }
+
+                // Manual CR filter (additional narrowing)
                 if (currentFilters.cr !== 'all') {
                     const cr = parseFloat(currentFilters.cr);
                     if (parseFloat(beast.cr) !== cr) return false;
@@ -1148,7 +1256,7 @@
         }
 
         function updateTransformationStatus() {
-            const statusContainer = document.querySelector('.filters');
+            const statusContainer = document.querySelector('.filter-section');
             let statusHTML = '';
 
             if (currentTransformation) {
